@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-04-13T16:04:35.843Z",
+  "lastUpdated": "2026-04-13T16:43:37.730Z",
   "files": [
     "skus.json",
     "inventory.json",
@@ -9,7 +9,8 @@
     "sales_l60.json",
     "sales_l90.json",
     "historical.json",
-    "projections.json"
+    "projections.json",
+    "last_inv.json"
   ],
   "sheetId": "1AjBf2goCw0GuK2FzzyyLx-7qV1-HkOgZ8XEnZFDaIxc",
   "sheetName": "Ordering Sheet Web App"
