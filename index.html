@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordering Sheet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2535;
+  --bg4: #252d40;
+  --border: #2a3350;
+  --border2: #3a4a6a;
+  --accent: #4f8ef7;
+  --accent2: #6fa3ff;
+  --accent-dim: rgba(79,142,247,0.15);
+  --green: #3ecf8e;
+  --green-dim: rgba(62,207,142,0.15);
+  --red: #f26557;
+  --red-dim: rgba(242,101,87,0.15);
+  --yellow: #f5c842;
+  --yellow-dim: rgba(245,200,66,0.12);
+  --purple: #9b72f7;
+  --text: #e4e8f0;
+  --text2: #8a94a8;
+  --text3: #5a6478;
+  --header-h: 54px;
+  --row-h: 30px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+input, select, textarea, button { font-family: inherit; font-size: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* HEADER */
+.app-header {
+  height: var(--header-h); background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 100;
+}
+.logo { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; white-space: nowrap; }
+.logo span { color: var(--text2); font-weight: 400; }
+.hdr-sep { width: 1px; height: 24px; background: var(--border); }
+.hdr-ctrl { display: flex; align-items: center; gap: 6px; }
+.hdr-label { color: var(--text3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+select.hdr-select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 28px 4px 10px; border-radius: 6px; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6478'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; cursor: pointer;
+}
+select.hdr-select:focus { outline: none; border-color: var(--accent); }
+.btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.btn-green { background: var(--green); color: #0a1a12; font-weight: 600; }
+.btn-green:hover { filter: brightness(1.1); }
+.btn-danger { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
+.btn-sm { padding: 3px 10px; font-size: 11px; }
+.hdr-spacer { flex: 1; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.status-dot.loading { background: var(--yellow); animation: pulse 1s infinite; }
+.status-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-text { font-size: 11px; color: var(--text3); }
+
+/* TOOLBAR */
+.toolbar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 8px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap;
+}
+.toolbar-group { display: flex; align-items: center; gap: 6px; }
+.tool-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
+select.tool-select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 28px 4px 8px; border-radius: 5px; appearance: none; font-size: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6478'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+}
+input.tool-input {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 8px; border-radius: 5px; font-size: 12px; width: 90px;
+}
+input.tool-input:focus, select.tool-select:focus { outline: none; border-color: var(--accent); }
+.month-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.month-chip {
+  padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); color: var(--text3); background: var(--bg3); transition: all 0.15s;
+}
+.month-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.tool-sep { width: 1px; height: 20px; background: var(--border); }
+
+/* MAIN LAYOUT */
+.app-body { flex: 1; display: flex; overflow: hidden; }
+.sheet-container { flex: 1; overflow: auto; position: relative; }
+
+/* TABLE */
+.ordering-table { border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 12px; white-space: nowrap; }
+.ordering-table th, .ordering-table td {
+  border: 1px solid var(--border); padding: 0 6px; height: var(--row-h); text-align: right;
+  min-width: 60px;
+}
+.ordering-table th { background: var(--bg3); color: var(--text2); font-weight: 600; font-size: 11px; text-align: center; position: sticky; top: 0; z-index: 10; }
+.col-product { text-align: left !important; min-width: 230px; max-width: 230px; position: sticky; left: 0; z-index: 5; background: var(--bg2); }
+th.col-product { z-index: 15; background: var(--bg3); }
+.ordering-table td.col-product { background: var(--bg2); border-right: 2px solid var(--border2); }
+
+/* Section headers */
+.section-header th { background: var(--bg4); border-top: 2px solid var(--border2); }
+.section-header .col-product { background: var(--bg4); }
+.section-title { background: var(--bg4) !important; color: var(--accent) !important; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+
+/* Month section colors */
+.month-feb th { background: #192840; } .month-feb .col-product { background: #192840; }
+.month-mar th { background: #1a2b1a; } .month-mar .col-product { background: #1a2b1a; }
+.month-apr th { background: #2a1f30; } .month-apr .col-product { background: #2a1f30; }
+.month-may th { background: #2a2818; } .month-may .col-product { background: #2a2818; }
+.month-jun th { background: #1a2830; } .month-jun .col-product { background: #1a2830; }
+.month-jul th { background: #281818; } .month-jul .col-product { background: #281818; }
+
+/* Data rows */
+.row-product td { background: var(--bg); }
+.row-product:hover td { background: var(--bg3); }
+.row-grand-total td { background: var(--bg3); font-weight: 600; border-top: 2px solid var(--border2); }
+.row-grand-total td.col-product { background: var(--bg3); }
+
+/* Cell types */
+td.num { font-family: 'IBM Plex Mono', monospace; }
+td.num-pos { color: var(--green); }
+td.num-neg { color: var(--red); }
+td.num-zero { color: var(--text3); }
+td.pct { color: var(--yellow); }
+td.editable { background: var(--accent-dim) !important; cursor: text; }
+td.editable:focus { outline: 2px solid var(--accent); background: var(--bg4) !important; }
+td.override { background: var(--purple) !important; color: white !important; opacity: 0.9; }
+td.po-land { background: var(--green-dim) !important; }
+td.order-qty { background: var(--yellow-dim) !important; font-weight: 600; color: var(--yellow); }
+td.inv-low { color: var(--red) !important; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 280px; background: var(--bg2); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.sidebar-tab {
+  flex: 1; padding: 10px; text-align: center; font-size: 11px; font-weight: 600;
+  color: var(--text3); cursor: pointer; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.sidebar-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--accent-dim); }
+.sidebar-content { flex: 1; overflow-y: auto; padding: 12px; }
+
+/* PANELS */
+.panel { margin-bottom: 16px; }
+.panel-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.field-group { margin-bottom: 10px; }
+.field-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.field-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 6px; font-size: 12px;
+}
+.field-input:focus { outline: none; border-color: var(--accent); }
+.field-input.small { padding: 4px 8px; font-size: 11px; }
+
+/* PRESET ITEMS */
+.preset-item {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.preset-item:hover { border-color: var(--accent); background: var(--bg4); }
+.preset-item.active { border-color: var(--accent); background: var(--accent-dim); }
+.preset-name { font-weight: 600; font-size: 12px; }
+.preset-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.preset-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* HISTORY ITEMS */
+.history-item {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px; margin-bottom: 8px;
+}
+.history-date { font-weight: 600; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+.history-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.history-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 24px; width: 520px; max-width: 95vw; max-height: 85vh; overflow-y: auto;
+}
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+.modal-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.modal-tab {
+  padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--text3); transition: all 0.15s;
+}
+.modal-tab.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+.modal-section { display: none; }
+.modal-section.active { display: block; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+.alert { padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 12px; }
+.alert-info { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent2); }
+.alert-warn { background: var(--yellow-dim); border: 1px solid var(--yellow); color: var(--yellow); }
+
+/* MULTI SELECT */
+.multi-select { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; padding: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; }
+.multi-select label { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 4px; border-radius: 4px; cursor: pointer; }
+.multi-select label:hover { background: var(--bg4); }
+.multi-select input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* LOADING */
+.loading-overlay { position: absolute; inset: 0; background: rgba(15,17,23,0.8); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.loading-overlay.hidden { display: none; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { margin-top: 12px; color: var(--text2); font-size: 13px; }
+
+/* TAGS */
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.tag-air { background: rgba(79,142,247,0.2); color: var(--accent2); border: 1px solid rgba(79,142,247,0.3); }
+.tag-sea { background: rgba(62,207,142,0.2); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+
+/* TOOLTIP */
+[data-tip] { position: relative; }
+[data-tip]:hover::after {
+  content: attr(data-tip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: var(--bg4); color: var(--text); padding: 4px 8px; border-radius: 4px; font-size: 11px;
+  white-space: nowrap; z-index: 100; border: 1px solid var(--border2); pointer-events: none;
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  height: 36px; background: var(--bg2); border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; font-size: 11px; color: var(--text3);
+}
+.bb-spacer { flex: 1; }
+.summary-pill { display: flex; align-items: center; gap: 5px; }
+.summary-val { font-family: 'IBM Plex Mono', monospace; color: var(--text); font-weight: 600; }
+
+/* NOTIFICATION */
+.notification {
+  position: fixed; bottom: 50px; right: 16px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 12px 16px; font-size: 12px; z-index: 500;
+  transform: translateY(0); opacity: 1; transition: all 0.3s; max-width: 280px;
+}
+.notification.success { border-color: var(--green); }
+.notification.error { border-color: var(--red); }
+.notification.hide { opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+/* PO PILL */
+.po-pill {
+  display: inline-flex; align-items: center; gap: 5px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 6px; font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="logo">Order<span>Sheet</span></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-ctrl">
+    <span class="hdr-label">Category</span>
+    <select class="hdr-select" id="selCategory" onchange="onCategoryChange()">
+      <option value="">— Select —</option>
+    </select>
+  </div>
+  <div class="hdr-ctrl">
+    <span class="hdr-label">Period</span>
+    <select class="hdr-select" id="selSalesPeriod" onchange="onPeriodChange()">
+      <option value="L30">L30</option>
+      <option value="L60">L60</option>
+      <option value="L90">L90</option>
+    </select>
+  </div>
+  <div class="hdr-ctrl">
+    <span class="hdr-label">Order Date</span>
+    <input type="date" class="hdr-select" id="selOrderDate" style="padding:4px 8px" />
+  </div>
+  <div class="hdr-sep"></div>
+  <div id="statusArea" style="display:flex;align-items:center;gap:6px">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">Not connected</span>
+  </div>
+  <div class="hdr-spacer"></div>
+  <button class="btn btn-outline btn-sm" onclick="loadFromGitHubJSON()" style="border-color:var(--green);color:var(--green)" data-tip="Reload latest JSON from GitHub">⟳ Reload Data</button>
+  
+  <button class="btn btn-green btn-sm" onclick="saveOrder()">💾 Save Order</button>
+  <button class="btn btn-primary btn-sm" onclick="exportExcel()">⬇ Export Excel</button>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-group">
+    <span class="tool-label">Products</span>
+    <button class="btn btn-outline btn-sm" onclick="toggleProductPanel()">Select Products ▾</button>
+    <span id="productCount" style="font-size:11px;color:var(--accent)"></span>
+  </div>
+  <div class="tool-sep"></div>
+  <div class="toolbar-group">
+    <span class="tool-label">Months</span>
+    <div class="month-chips" id="monthChips"></div>
+  </div>
+  <div class="tool-sep"></div>
+  <div class="toolbar-group">
+    <span class="tool-label">DOS</span>
+    <input class="tool-input" id="inpDOS" type="number" value="30" style="width:60px" onchange="recalcAll()" />
+  </div>
+  <div class="toolbar-group">
+    <span class="tool-label">Stores</span>
+    <input class="tool-input" id="inpStores" type="number" value="43" style="width:60px" onchange="recalcAll()" />
+  </div>
+  <div class="tool-sep"></div>
+  <div class="toolbar-group">
+    <span class="tool-label">Preset</span>
+    <select class="tool-select" id="selPreset" onchange="loadPreset()">
+      <option value="">— No Preset —</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="savePreset()">+ Save</button>
+  </div>
+</div>
+
+<!-- PRODUCT PANEL (dropdown) -->
+<div id="productPanel" style="display:none;position:absolute;top:130px;left:16px;z-index:200;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+    <span style="font-weight:600;font-size:12px">Select Products</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-outline btn-sm" onclick="selectAllProducts()">All</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAllProducts()">None</button>
+    </div>
+  </div>
+  <div class="multi-select" id="productList"></div>
+  <div style="margin-top:8px;display:flex;justify-content:flex-end">
+    <button class="btn btn-primary btn-sm" onclick="applyProducts()">Apply</button>
+  </div>
+</div>
+
+<!-- MAIN BODY -->
+<div class="app-body">
+  <div class="sheet-container" id="sheetContainer">
+    <div class="loading-overlay" id="loadingOverlay">
+      <div style="text-align:center">
+        <div class="loading-spinner"></div>
+        <div class="loading-msg" id="loadingMsg">Loading data from GitHub...</div>
+      </div>
+    </div>
+    <div id="sheetContent" style="padding:0">
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);flex-direction:column;gap:12px">
+        <div class="loading-spinner"></div>
+        <div style="font-size:13px;margin-top:12px">Loading data...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" onclick="switchSideTab('presets')">Presets</div>
+      <div class="sidebar-tab" onclick="switchSideTab('history')">History</div>
+      <div class="sidebar-tab" onclick="switchSideTab('summary')">Summary</div>
+    </div>
+    <div class="sidebar-content">
+      <!-- PRESETS TAB -->
+      <div id="side-presets">
+        <div class="panel">
+          <div class="panel-title">Save as Preset</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px">
+            <input class="field-input" id="presetNameInput" placeholder="Preset name…" style="flex:1;padding:6px 10px;font-size:12px" 
+              onkeydown="if(event.key==='Enter') savePreset()" />
+            <button class="btn btn-primary btn-sm" onclick="savePreset()" style="white-space:nowrap">+ Save</button>
+          </div>
+          <div class="panel-title" style="margin-top:4px">Saved Presets</div>
+          <div id="presetList">
+            <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No presets saved yet</div>
+          </div>
+        </div>
+      </div>
+      <!-- HISTORY TAB -->
+      <div id="side-history" style="display:none">
+        <div class="panel">
+          <div class="panel-title">Order History</div>
+          <div id="historyList">
+            <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No saved orders yet</div>
+          </div>
+        </div>
+      </div>
+      <!-- SUMMARY TAB -->
+      <div id="side-summary" style="display:none">
+        <div class="panel">
+          <div class="panel-title">Order Summary</div>
+          <div id="summaryContent">
+            <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Generate sheet to see summary</div>
+          </div>
+        </div>
+        <div class="panel" id="airsea-panel" style="display:none">
+          <div class="panel-title">Air vs Sea Breakdown</div>
+          <div id="airseaContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="summary-pill">Products: <span class="summary-val" id="bbProducts">0</span></div>
+  <div class="summary-pill" style="margin-left:8px">Total Inv: <span class="summary-val" id="bbInv">—</span></div>
+  <div class="summary-pill" style="margin-left:8px">Monthly Sales: <span class="summary-val" id="bbSales">—</span></div>
+  <div class="summary-pill" style="margin-left:8px">Total Order: <span class="summary-val" id="bbOrder">—</span></div>
+  <div class="bb-spacer"></div>
+  <span id="lastUpdated" style="color:var(--text3)">Last updated: —</span>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification hide" id="notification"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════
+const APP = {
+  config: {
+    ghToken: '', ghOwner: 'jaysonsnl13', ghRepo: 'Ordering-Sheet', ghBranch: 'main',
+    skuTab: 'ALL SKU', invTab: 'INV', histTab: 'Historical MOM', projTab: 'Projections',
+    l30Tab: 'L30', l60Tab: 'L60', l90Tab: 'L90', poTab: 'PO On Order', optTab: 'Optimal Stocks',
+    dos: 30, salesPeriod: 'L30', seaDays: 45, airDays: 15, stores: 43
+  },
+  raw: { skus: [], inventory: [], po: [], l30: [], l60: [], l90: [], historical: [], projections: [], optimal: [] },
+  derived: { categories: [], productsByCategory: {}, skuMap: {} },
+  sheet: {
+    category: '', products: [], selectedProducts: [],
+    months: ['February','March','April','May','June','July'],
+    activeMonths: ['February','March','April','May'],
+    salesPeriod: 'L30', dos: 30, stores: 43,
+    orderDate: new Date().toISOString().split('T')[0]
+  },
+  calc: {},  // calculated data
+  overrides: {}, // { product: { month: { sales, bump, sizes }, po: { ref: landingMonth } } }
+  presets: [],
+  history: [],
+  editableToday: true,
+  connected: false
+};
+
+const SIZES = [36, 38, 40, 42, 44, 46, 48];
+const MONTHS_SHORT = {January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11};
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  loadLocalConfig();
+  loadLocalData();
+  renderMonthChips();
+  document.getElementById('selOrderDate').value = APP.sheet.orderDate;
+  document.getElementById('inpDOS').value = APP.config.dos;
+  document.getElementById('inpStores').value = APP.config.stores;
+  // Always load from GitHub on startup — settings only needed to change repo
+  loadFromGitHubJSON();
+});
+
+function loadLocalConfig() {
+  const saved = localStorage.getItem('ordersheet_config');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    // Only overwrite defaults if saved value is non-empty
+    Object.keys(parsed).forEach(k => {
+      if (parsed[k] !== '' && parsed[k] !== null && parsed[k] !== undefined) {
+        APP.config[k] = parsed[k];
+      }
+    });
+  }
+  const presets = localStorage.getItem('ordersheet_presets');
+  if (presets) APP.presets = JSON.parse(presets);
+  const history = localStorage.getItem('ordersheet_history');
+  if (history) APP.history = JSON.parse(history);
+  const overrides = localStorage.getItem('ordersheet_overrides');
+  if (overrides) APP.overrides = JSON.parse(overrides);
+}
+
+function loadLocalData() {
+  const data = localStorage.getItem('ordersheet_rawdata');
+  if (data) {
+    const parsed = JSON.parse(data);
+    Object.assign(APP.raw, parsed);
+    processRawData();
+  }
+}
+
+function saveLocalConfig() { localStorage.setItem('ordersheet_config', JSON.stringify(APP.config)); }
+
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+
+
+
+
+
+
+
+
+/${branch}/${path}/skus.json`;
+}
+
+// ══════════════════════════════════════════════════
+// GOOGLE SHEETS API
+// ══════════════════════════════════════════════════
+async function fetchSheet(tabName, range = '') {
+  const id = APP.config.sheetId;
+  const key = APP.config.apiKey;
+  if (!id) throw new Error('No Sheet ID configured');
+  const r = range ? `${encodeURIComponent(tabName)}!${range}` : encodeURIComponent(tabName);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${r}${key ? '?key='+key : ''}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.values || [];
+}
+
+async function fetchAllData() {
+  setStatus('loading', 'Loading...');
+  showLoading('Connecting to Google Sheets...');
+  try {
+    const [skus, inv, historical, l30, l60, l90, po, optimal, proj] = await Promise.all([
+      fetchSheet(APP.config.skuTab).catch(()=>[]),
+      fetchSheet(APP.config.invTab).catch(()=>[]),
+      fetchSheet(APP.config.histTab).catch(()=>[]),
+      fetchSheet(APP.config.l30Tab).catch(()=>[]),
+      fetchSheet(APP.config.l60Tab).catch(()=>[]),
+      fetchSheet(APP.config.l90Tab).catch(()=>[]),
+      fetchSheet(APP.config.poTab).catch(()=>[]),
+      fetchSheet(APP.config.optTab).catch(()=>[]),
+      fetchSheet(APP.config.projTab).catch(()=>[])
+    ]);
+    APP.raw = { skus, inventory: inv, historical, l30, l60, l90, po, optimal, projections: proj };
+    localStorage.setItem('ordersheet_rawdata', JSON.stringify(APP.raw));
+    processRawData();
+    setStatus('ok', `Connected • ${new Date().toLocaleTimeString()}`);
+    document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+    notify('Data loaded successfully', 'success');
+  } catch(e) {
+    setStatus('error', 'Connection failed');
+    notify(`Error: ${e.message}`, 'error');
+    console.error(e);
+    // Use cached data if available
+    if (APP.raw.skus?.length > 0) processRawData();
+  }
+  hideLoading();
+}
+
+async function refreshData() { await fetchAllData(); recalcAll(); buildSheet(); }
+
+// Load from pre-built GitHub JSON (faster — no Sheets API needed)
+async function loadFromGitHubJSON() {
+  const { ghOwner, ghRepo, ghBranch } = APP.config;
+  if (!ghOwner || !ghRepo) { notify('Configure GitHub in Settings first', 'error'); return; }
+  setStatus('loading', 'Loading from GitHub JSON...');
+  showLoading('Loading cached JSON from GitHub...');
+  const base = `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch||'main'}/${APP.config.dataPath||'data'}`;
+  try {
+    const [skuRes, invRes, poRes, optRes, l30Res, l60Res, l90Res, histRes, projRes] = await Promise.all([
+      fetch(`${base}/skus.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/inventory.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/po.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/optimal.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/sales_l30.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/sales_l60.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/sales_l90.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/historical.json`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${base}/projections.json`).then(r=>r.json()).catch(()=>({})),
+    ]);
+    // Map pre-built JSON into APP.derived directly (already processed by Apps Script)
+    const d = APP.derived;
+    d.skuMap    = skuRes.bySKU    || {};
+    d.categories = Object.keys(skuRes.byCategory || {});
+    d.productsByCategory = skuRes.byCategory || {};
+    d.inventory = invRes.inventory || {};
+    d.poOnOrder = (poRes.orders   || []).map(o => ({
+      ...o, sizes: buildPOSizes(o.sku, poRes.orders, d.skuMap)
+    }));
+    d.sales     = { L30: l30Res.sales||{}, L60: l60Res.sales||{}, L90: l90Res.sales||{} };
+    d.historical = histRes.historical || {};
+    d.historicalByCategory = histRes.byCategory || {};
+    d.projections = projRes.projections || {};
+    d.optimalStock = optRes.optimal || {};
+    setStatus('ok', `GitHub JSON loaded • ${new Date().toLocaleTimeString()}`);
+    document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+    updateCategorySelect();
+    notify('GitHub JSON loaded successfully', 'success');
+  } catch(e) {
+    setStatus('error', 'GitHub JSON load failed');
+    notify('Error: ' + e.message, 'error');
+  }
+  hideLoading();
+}
+
+function buildPOSizes(sku, allOrders, skuMap) {
+  // Group qty by size for a given SKU reference
+  const sizes = {};
+  allOrders.filter(o => o.sku === sku).forEach(o => {
+    const size = parseInt(skuMap[o.sku]?.size);
+    if (!isNaN(size)) sizes[size] = (sizes[size]||0) + o.qty;
+  });
+  return sizes;
+}
+
+// ══════════════════════════════════════════════════
+// PROCESS RAW DATA
+// ══════════════════════════════════════════════════
+function processRawData() {
+  const { skus, inventory, po, l30, l60, l90, historical, projections, optimal } = APP.raw;
+  const d = APP.derived;
+
+  // SKU Map: SKU -> { parentName, category, size }
+  d.skuMap = {};
+  d.categories = [];
+  d.productsByCategory = {};
+  if (skus.length > 1) {
+    skus.slice(1).forEach(row => {
+      if (!row || !row[2]) return;
+      const parentName = (row[0]||'').trim();
+      const category = (row[1]||'').trim();
+      const sku = (row[2]||'').trim();
+      const size = (row[4]||'').trim();
+      if (!sku) return;
+      d.skuMap[sku] = { parentName, category, size };
+      if (category && !d.categories.includes(category)) d.categories.push(category);
+      if (category && parentName) {
+        if (!d.productsByCategory[category]) d.productsByCategory[category] = [];
+        if (!d.productsByCategory[category].includes(parentName)) d.productsByCategory[category].push(parentName);
+      }
+    });
+  }
+
+  // Inventory: SKU -> { onHand, inTransit }
+  d.inventory = {};
+  if (inventory.length > 2) {
+    inventory.slice(2).forEach(row => {
+      if (!row || !row[1]) return;
+      const sku = (row[1]||'').trim();
+      if (!sku) return;
+      d.inventory[sku] = { onHand: parseFloat(row[5])||0, inTransit: parseFloat(row[6])||0 };
+    });
+  }
+
+  // PO On Order
+  d.poOnOrder = [];
+  if (po.length > 1) {
+    po.slice(1).forEach(row => {
+      if (!row || !row[4]) return;
+      const sku = (row[4]||'').trim();
+      if (!sku) return;
+      d.poOnOrder.push({ sku, qty: parseFloat(row[6])||0, exf: row[8]||'', ref: row[9]||'', mode: detectMode(row[9]||'') });
+    });
+  }
+
+  // Sales
+  d.sales = { L30:{}, L60:{}, L90:{} };
+  [[l30,'L30'],[l60,'L60'],[l90,'L90']].forEach(([data, period]) => {
+    if (data.length > 1) {
+      data.slice(1).forEach(row => {
+        if (!row || !row[0]) return;
+        const sku = (row[0]||'').trim();
+        const qty = parseFloat(row[2])||0;
+        if (sku) d.sales[period][sku] = (d.sales[period][sku]||0) + qty;
+      });
+    }
+  });
+
+  // Historical MOM: { "YYYY-M": { sku: qty } }
+  // Columns: A=Month, B=SKU/Product Variant, C=Product Type, D=Net items sold
+  d.historical = {};
+  d.historicalByCategory = {};
+  if (historical.length > 1) {
+    historical.slice(1).forEach(row => {
+      if (!row || !row[0]) return;
+      const rawDate  = row[0];
+      const sku      = (row[1]||'').trim();   // col B: Product Variant
+      const category = (row[2]||'').trim();   // col C: Product Type
+      const qty      = parseFloat(row[3])||0; // col D: Net items sold
+      if (!sku) return;
+      // Parse date — handles Date objects, "1/1/2022", "2022-01-01"
+      let dateKey = '';
+      if (rawDate instanceof Date) {
+        dateKey = `${rawDate.getFullYear()}-${rawDate.getMonth()+1}`;
+      } else if (typeof rawDate === 'string' && rawDate.includes('/')) {
+        const parts = rawDate.split('/');
+        if (parts.length === 3) dateKey = `${parts[2]}-${parseInt(parts[0])}`;
+      } else {
+        const parsed = new Date(rawDate);
+        if (!isNaN(parsed)) dateKey = `${parsed.getFullYear()}-${parsed.getMonth()+1}`;
+      }
+      if (!dateKey) return;
+      // SKU-level
+      if (!d.historical[dateKey]) d.historical[dateKey] = {};
+      d.historical[dateKey][sku] = (d.historical[dateKey][sku]||0) + qty;
+      // Category-level (for YOY and projections)
+      if (category) {
+        if (!d.historicalByCategory[dateKey]) d.historicalByCategory[dateKey] = {};
+        d.historicalByCategory[dateKey][category] = (d.historicalByCategory[dateKey][category]||0) + qty;
+      }
+    });
+  }
+
+  // Projections: { year: { category: { month: qty } } }
+  d.projections = {};
+  if (projections.length > 2) {
+    const year = projections[0]?.[0] || new Date().getFullYear();
+    const months = projections[1]?.slice(1) || [];
+    projections.slice(2).forEach(row => {
+      if (!row || !row[0]) return;
+      const category = (row[0]||'').trim();
+      if (!d.projections[year]) d.projections[year] = {};
+      if (!d.projections[year][category]) d.projections[year][category] = {};
+      months.forEach((m,i) => {
+        if (m) d.projections[year][category][m] = parseFloat(row[i+1])||0;
+      });
+    });
+  }
+
+  // Optimal Stock: { sku: { size: qty, total: qty } }
+  d.optimalStock = {};
+  if (optimal.length > 1) {
+    optimal.slice(1).forEach(row => {
+      if (!row || !row[1]) return;
+      const sku = (row[1]||'').trim();
+      const qty = parseFloat(row[2])||0;
+      d.optimalStock[sku] = (d.optimalStock[sku]||0) + qty;
+    });
+  }
+
+  updateCategorySelect();
+  renderPresetsUI();
+  renderHistoryUI();
+}
+
+function detectMode(ref) {
+  const r = ref.toLowerCase();
+  if (r.includes('air')) return 'Air';
+  return 'Sea';
+}
+
+// ══════════════════════════════════════════════════
+// UI SETUP
+// ══════════════════════════════════════════════════
+function updateCategorySelect() {
+  const sel = document.getElementById('selCategory');
+  const cats = APP.derived.categories;
+  sel.innerHTML = '<option value="">— Select Category —</option>';
+  cats.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  if (APP.sheet.category) sel.value = APP.sheet.category;
+  if (!APP.sheet.category && cats.length > 0) { sel.value = cats[0]; APP.sheet.category = cats[0]; onCategoryChange(); }
+}
+
+function onCategoryChange() {
+  APP.sheet.category = document.getElementById('selCategory').value;
+  const products = APP.derived.productsByCategory[APP.sheet.category] || [];
+  APP.sheet.products = [...products];
+  APP.sheet.selectedProducts = [...products];
+  renderProductList();
+  buildSheet();
+}
+
+function onPeriodChange() {
+  APP.sheet.salesPeriod = document.getElementById('selSalesPeriod').value;
+  recalcAll(); buildSheet();
+}
+
+function renderProductList() {
+  const products = APP.sheet.products;
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  products.forEach(p => {
+    const lbl = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = p; cb.checked = APP.sheet.selectedProducts.includes(p);
+    cb.onchange = () => {};
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' ' + p));
+    list.appendChild(lbl);
+  });
+}
+
+function selectAllProducts() { document.querySelectorAll('#productList input').forEach(cb => cb.checked = true); }
+function clearAllProducts() { document.querySelectorAll('#productList input').forEach(cb => cb.checked = false); }
+function applyProducts() {
+  APP.sheet.selectedProducts = Array.from(document.querySelectorAll('#productList input:checked')).map(cb=>cb.value);
+  document.getElementById('productPanel').style.display = 'none';
+  document.getElementById('productCount').textContent = `(${APP.sheet.selectedProducts.length})`;
+  buildSheet();
+}
+function toggleProductPanel() {
+  const p = document.getElementById('productPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  renderProductList();
+}
+
+function renderMonthChips() {
+  const chips = document.getElementById('monthChips');
+  chips.innerHTML = '';
+  APP.sheet.months.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'month-chip' + (APP.sheet.activeMonths.includes(m) ? ' active' : '');
+    div.textContent = m.slice(0,3);
+    div.dataset.month = m;
+    div.onclick = () => toggleMonth(m, div);
+    chips.appendChild(div);
+  });
+}
+
+function toggleMonth(m, el) {
+  if (APP.sheet.activeMonths.includes(m)) {
+    if (APP.sheet.activeMonths.length > 1) APP.sheet.activeMonths = APP.sheet.activeMonths.filter(x=>x!==m);
+  } else { APP.sheet.activeMonths.push(m); }
+  el.classList.toggle('active', APP.sheet.activeMonths.includes(m));
+  buildSheet();
+}
+
+// ══════════════════════════════════════════════════
+// CALCULATIONS ENGINE
+// ══════════════════════════════════════════════════
+function getInventoryForProduct(productName) {
+  // Sum On Hand + In Transit for all SKUs matching this product
+  const inv = { onHand: {}, inTransit: {} };
+  SIZES.forEach(s => { inv.onHand[s] = 0; inv.inTransit[s] = 0; });
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    const size = parseInt(info.size);
+    if (!SIZES.includes(size)) return;
+    const invData = APP.derived.inventory?.[sku] || { onHand:0, inTransit:0 };
+    inv.onHand[size] = (inv.onHand[size]||0) + invData.onHand;
+    inv.inTransit[size] = (inv.inTransit[size]||0) + invData.inTransit;
+  });
+  return inv;
+}
+
+function getSalesForProduct(productName, period) {
+  const sales = {};
+  SIZES.forEach(s => sales[s] = 0);
+  const salesData = APP.derived.sales?.[period] || {};
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    const size = parseInt(info.size);
+    if (!SIZES.includes(size)) return;
+    sales[size] = (sales[size]||0) + (salesData[sku]||0);
+  });
+  return sales;
+}
+
+function getHistoricalSalesForProduct(productName, year, month) {
+  const key = `${year}-${month}`;
+  const hist = APP.derived.historical?.[key] || {};
+  const sales = {};
+  SIZES.forEach(s => sales[s] = 0);
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    const size = parseInt(info.size);
+    if (!SIZES.includes(size)) return;
+    sales[size] = (sales[size]||0) + (hist[sku]||0);
+  });
+  return sales;
+}
+
+function getSizeBreakdown(productName, period) {
+  const sales = getSalesForProduct(productName, period);
+  const total = SIZES.reduce((s,sz) => s + (sales[sz]||0), 0);
+  const pct = {};
+  SIZES.forEach(sz => pct[sz] = total > 0 ? (sales[sz]||0)/total : 1/SIZES.length);
+  return pct;
+}
+
+function getPeriodDays(period) {
+  return period === 'L30' ? 30 : period === 'L60' ? 60 : 90;
+}
+
+function getDaysInMonth(year, monthName) {
+  const m = MONTHS_SHORT[monthName];
+  return new Date(year, m+1, 0).getDate();
+}
+
+function estimateCurrentMonthSales(productName, period, currentDate) {
+  // (sales / days so far) * total days
+  const sales = getSalesForProduct(productName, period);
+  const salesTotal = SIZES.reduce((s,sz)=>s+(sales[sz]||0), 0);
+  const periodDays = getPeriodDays(period);
+  const today = new Date(currentDate || APP.sheet.orderDate);
+  const dayOfMonth = today.getDate();
+  const totalDays = getDaysInMonth(today.getFullYear(), MONTHS_FULL[today.getMonth()]);
+  const dailySales = salesTotal / periodDays;
+  return dailySales * totalDays;
+}
+
+function calcDOS(productName, period) {
+  const sales = getSalesForProduct(productName, period);
+  const total = SIZES.reduce((s,sz)=>s+(sales[sz]||0), 0);
+  const periodDays = getPeriodDays(period);
+  return total > 0 ? periodDays / (total / periodDays) : 0; // days to sell through current inv
+}
+
+function getPOForProduct(productName) {
+  const pos = [];
+  (APP.derived.poOnOrder || []).forEach(po => {
+    const info = APP.derived.skuMap?.[po.sku];
+    if (info?.parentName === productName) pos.push(po);
+  });
+  // Group by ref
+  const grouped = {};
+  pos.forEach(po => {
+    const key = po.ref || po.exf;
+    if (!grouped[key]) grouped[key] = { ref: po.ref, exf: po.exf, mode: po.mode, sizes: {}, total: 0 };
+    const size = parseInt(APP.derived.skuMap?.[po.sku]?.size);
+    if (SIZES.includes(size)) { grouped[key].sizes[size] = (grouped[key].sizes[size]||0) + po.qty; grouped[key].total += po.qty; }
+  });
+  return Object.values(grouped);
+}
+
+function calcLandingMonth(exf, mode, year) {
+  if (!exf) return null;
+  const d = new Date(exf);
+  if (isNaN(d)) return null;
+  const addDays = mode === 'Air' ? (APP.config.airDays||15) : (APP.config.seaDays||45);
+  d.setDate(d.getDate() + addDays);
+  const dom = d.getDate();
+  // If day 1-10: land at end of that month; if 11+: next month
+  if (dom > 10) d.setMonth(d.getMonth() + 1);
+  return MONTHS_FULL[d.getMonth()];
+}
+
+function calcProjectedSales(productName, month, period, orderDate, prevMonthSales) {
+  // Override check
+  const ov = APP.overrides?.[productName]?.[month];
+  if (ov?.sales !== undefined && ov.sales !== null) return ov.sales;
+
+  const today = new Date(orderDate || APP.sheet.orderDate);
+  const orderMonth = MONTHS_FULL[today.getMonth()];
+  const orderYear = today.getFullYear();
+  const monthIdx = MONTHS_SHORT[month];
+
+  if (month === orderMonth) {
+    // Current month: project from remaining selling days
+    return estimateCurrentMonthSales(productName, period, orderDate);
+  } else {
+    // Future: based on prev month + bump
+    const base = prevMonthSales !== undefined ? prevMonthSales : estimateCurrentMonthSales(productName, period, orderDate);
+    const bump = APP.overrides?.[productName]?.[month]?.bump || 0;
+    return base * (1 + bump/100);
+  }
+}
+
+function calcProjectedInventory(productName, month, prevInventory, projectedSales, poLanding) {
+  return Math.max(0, (prevInventory||0) - (projectedSales||0) + (poLanding||0));
+}
+
+function calcOrderLanding(productName, month, monthInv, monthSales) {
+  const dos = parseInt(document.getElementById('inpDOS')?.value || APP.config.dos || 30);
+  const optimal = getOptimalForProduct(productName);
+  const dailySales = monthSales > 0 ? monthSales / 30 : 0;
+  const needed = dailySales * dos + optimal;
+  return Math.max(0, needed - monthInv);
+}
+
+function getOptimalForProduct(productName) {
+  let total = 0;
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName === productName) total += APP.derived.optimalStock?.[sku] || 0;
+  });
+  return total;
+}
+
+function getL30ForProduct(productName) {
+  return getSalesForProduct(productName, 'L30');
+}
+
+function recalcAll() {
+  APP.config.dos = parseInt(document.getElementById('inpDOS').value) || 30;
+  APP.config.stores = parseInt(document.getElementById('inpStores').value) || 43;
+  buildSheet();
+}
+
+// ══════════════════════════════════════════════════
+// BUILD SHEET
+// ══════════════════════════════════════════════════
+function buildSheet() {
+  if (!APP.sheet.selectedProducts?.length) {
+    document.getElementById('sheetContent').innerHTML = `<div style="padding:40px;color:var(--text3);text-align:center">No products selected. <a href="#" onclick="toggleProductPanel();return false" style="color:var(--accent)">Select products</a> to continue.</div>`;
+    return;
+  }
+  const products = APP.sheet.selectedProducts;
+  const months = APP.sheet.activeMonths;
+  const period = document.getElementById('selSalesPeriod')?.value || APP.sheet.salesPeriod;
+  const orderDate = document.getElementById('selOrderDate')?.value || APP.sheet.orderDate;
+  const today = new Date(orderDate);
+  const today_str = orderDate;
+
+  // Determine if editable (today)
+  const savedDate = localStorage.getItem('ordersheet_savedate_' + orderDate);
+  APP.editableToday = true; // Always editable for current session
+
+  const table = document.createElement('table');
+  table.className = 'ordering-table';
+  table.innerHTML = '';
+
+  // ── HEADER ROW 1: Section titles ──
+  const head = table.createTHead();
+  {
+    const tr = head.insertRow();
+    tr.className = 'section-header';
+    addTH(tr, `${APP.sheet.category} – ${formatDate(orderDate)}`, 'col-product section-title', 1, 1);
+    addTH(tr, `Current Inventory (${formatDate(orderDate)})`, 'section-title', 8, 1);
+    addTH(tr, 'Sales & Metrics', 'section-title', 5, 1);
+    months.forEach(m => {
+      addTH(tr, `${m} ${today.getFullYear()}`, 'section-title', 20, 1);
+    });
+  }
+  // ── HEADER ROW 2: Column names ──
+  {
+    const tr = head.insertRow();
+    addTH(tr, 'Product Name', 'col-product');
+    // Inventory sizes
+    SIZES.forEach(s => addTH(tr, s));
+    addTH(tr, 'Total');
+    // Metrics
+    addTH(tr, period + ' Sales');
+    addTH(tr, 'DOS');
+    addTH(tr, 'Est. Mo. Sales');
+    addTH(tr, 'L90');
+    addTH(tr, 'LY Sales');
+    // Per month columns
+    months.forEach(m => {
+      const mi = `month-${m.toLowerCase().slice(0,3)}`;
+      addTH(tr, 'Proj. Sales', mi); addTH(tr, 'Override', mi); addTH(tr, 'Bump%', mi);
+      addTH(tr, 'Beg. Inv', mi); addTH(tr, 'PO In', mi);
+      SIZES.forEach(s => addTH(tr, s, mi));
+      addTH(tr, 'Total Inv', mi);
+      addTH(tr, 'Order Qty', mi); addTH(tr, 'DOS Thr', mi);
+      addTH(tr, 'LY MOM', mi); addTH(tr, 'YOY%', mi);
+    });
+  }
+
+  // ── DATA ROWS ──
+  const body = table.createTBody();
+  let totals = {
+    inv: {}, sales: {}, l90: {}, lysal: {},
+    monthProjSales: {}, monthInv: {}, monthOrderQty: {}
+  };
+  SIZES.forEach(s => { totals.inv[s]=0; totals.sales[s]=0; totals.l90[s]=0; totals.lysal[s]=0; });
+  months.forEach(m => { totals.monthProjSales[m]=0; totals.monthInv[m]={total:0}; totals.monthOrderQty[m]=0; SIZES.forEach(s=>totals.monthInv[m][s]=0); });
+
+  const poGroups = {};  // Track all PO refs across products
+  let prevMonthSalesByProduct = {};
+
+  products.forEach(product => {
+    const invData = getInventoryForProduct(product);
+    const salesData = getSalesForProduct(product, period);
+    const l30Data = getSalesForProduct(product, 'L30');
+    const l90Data = getSalesForProduct(product, 'L90');
+    const lyMonth = MONTHS_SHORT[MONTHS_FULL[today.getMonth()]];
+    const lyData = getHistoricalSalesForProduct(product, today.getFullYear()-1, today.getMonth()+1);
+    const sizeBreakdown = getSizeBreakdown(product, period);
+    const pos = getPOForProduct(product);
+    const estSales = estimateCurrentMonthSales(product, period, today_str);
+    const invTotal = SIZES.reduce((s,sz) => s+(invData.onHand[sz]||0)+(invData.inTransit[sz]||0), 0);
+    const salesTotal = SIZES.reduce((s,sz) => s+(salesData[sz]||0), 0);
+    const l90Total = SIZES.reduce((s,sz) => s+(l90Data[sz]||0), 0);
+    const lyTotal = SIZES.reduce((s,sz) => s+(lyData[sz]||0), 0);
+    const dos = salesTotal > 0 ? (getPeriodDays(period) * invTotal / salesTotal).toFixed(1) : '—';
+
+    const tr = body.insertRow();
+    tr.className = 'row-product';
+
+    addTD(tr, product, 'col-product');
+    SIZES.forEach(s => {
+      const v = (invData.onHand[s]||0)+(invData.inTransit[s]||0);
+      totals.inv[s] += v;
+      addTD(tr, fmt(v), v===0?'num-zero':'num');
+    });
+    addTD(tr, fmt(invTotal), 'num');
+    addTD(tr, fmt(salesTotal), 'num');
+    addTD(tr, dos, 'num');
+    addTD(tr, fmt(Math.round(estSales)), 'num');
+    addTD(tr, fmt(l90Total), 'num');
+    addTD(tr, fmt(lyTotal), 'num');
+    SIZES.forEach(s => { totals.sales[s]+=(salesData[s]||0); totals.l90[s]+=(l90Data[s]||0); totals.lysal[s]+=(lyData[s]||0); });
+
+    // Monthly columns
+    let prevInv = invTotal;
+    let prevSales = estSales;
+
+    months.forEach(m => {
+      const mi = `month-${m.toLowerCase().slice(0,3)}`;
+      const monthIdx = MONTHS_SHORT[m];
+      const lyM = getHistoricalSalesForProduct(product, today.getFullYear()-1, monthIdx+1);
+      const lyMTotal = SIZES.reduce((s,sz)=>s+(lyM[sz]||0),0);
+
+      // Projected sales
+      let projSales = calcProjectedSales(product, m, period, today_str, prevSales);
+      const overrideSales = APP.overrides?.[product]?.[m]?.sales;
+      const bump = APP.overrides?.[product]?.[m]?.bump || 0;
+
+      // PO landing this month
+      let poInTotal = 0;
+      const poBySize = {};
+      SIZES.forEach(s=>poBySize[s]=0);
+      pos.forEach(po => {
+        const overrideMonth = APP.overrides?.po?.[po.ref]?.landingMonth;
+        const landingMonth = overrideMonth || calcLandingMonth(po.exf, po.mode, today.getFullYear());
+        if (landingMonth === m) {
+          SIZES.forEach(s => { poBySize[s] += po.sizes[s]||0; });
+          poInTotal += po.total;
+        }
+      });
+
+      const projInv = calcProjectedInventory(product, m, prevInv, projSales, poInTotal);
+      const orderQty = calcOrderLanding(product, m, projInv, projSales);
+      const yoy = lyMTotal > 0 ? ((projSales - lyMTotal) / lyMTotal * 100).toFixed(1) : '—';
+
+      // LY MOM
+      const lyPrevM = getHistoricalSalesForProduct(product, today.getFullYear()-1, monthIdx);
+      const lyPrevTotal = SIZES.reduce((s,sz)=>s+(lyPrevM[sz]||0),0);
+      const lyMOM = lyPrevTotal > 0 ? ((lyMTotal-lyPrevTotal)/lyPrevTotal*100).toFixed(1) : '—';
+
+      // Totals
+      totals.monthProjSales[m] += projSales;
+      totals.monthInv[m].total += projInv;
+      SIZES.forEach(s => totals.monthInv[m][s] = (totals.monthInv[m][s]||0)+((invData.onHand[s]||0)+(invData.inTransit[s]||0)));
+      totals.monthOrderQty[m] += orderQty;
+
+      // Editable cells for overrides
+      const cellSales = addTD(tr, fmt(Math.round(projSales)), mi + ' num');
+      const cellOverride = addTD(tr, overrideSales !== undefined ? fmt(overrideSales) : '', mi + ' editable');
+      cellOverride.contentEditable = 'true';
+      cellOverride.dataset.product = product; cellOverride.dataset.month = m; cellOverride.dataset.type = 'sales';
+      cellOverride.addEventListener('blur', onCellEdit);
+
+      const cellBump = addTD(tr, bump !== 0 ? bump+'%' : '', mi + ' editable');
+      cellBump.contentEditable = 'true';
+      cellBump.dataset.product = product; cellBump.dataset.month = m; cellBump.dataset.type = 'bump';
+      cellBump.addEventListener('blur', onCellEdit);
+
+      addTD(tr, fmt(Math.round(prevInv)), mi + ' num');
+      addTD(tr, fmt(poInTotal), mi + ' num' + (poInTotal>0?' po-land':''));
+      SIZES.forEach(s => {
+        const v = (invData.onHand[s]||0)+(invData.inTransit[s]||0) - Math.round(projSales*(sizeBreakdown[s]||0)) + (poBySize[s]||0);
+        addTD(tr, fmt(Math.max(0,Math.round(v))), mi + ' num' + (v<0?' inv-low':''));
+      });
+      addTD(tr, fmt(Math.round(projInv)), mi + ' num');
+      addTD(tr, fmt(Math.round(orderQty)), mi + ' order-qty');
+      const dosThr = Math.round(projSales / 30 * APP.config.dos + getOptimalForProduct(product));
+      addTD(tr, fmt(dosThr), mi + ' num');
+      addTD(tr, lyMOM !== '—' ? lyMOM+'%' : '—', mi + ' pct');
+      addTD(tr, yoy !== '—' ? yoy+'%' : (projSales > lyMTotal && lyMTotal===0 ? 'N/A' : '—'), mi + ' pct');
+
+      prevInv = projInv;
+      prevSales = projSales;
+    });
+  });
+
+  // ── GRAND TOTAL ROW ──
+  {
+    const tr = body.insertRow();
+    tr.className = 'row-grand-total';
+    addTD(tr, 'GRAND TOTAL', 'col-product');
+    SIZES.forEach(s => addTD(tr, fmt(totals.inv[s]), 'num'));
+    addTD(tr, fmt(SIZES.reduce((a,s)=>a+(totals.inv[s]||0),0)), 'num');
+    addTD(tr, fmt(SIZES.reduce((a,s)=>a+(totals.sales[s]||0),0)), 'num');
+    addTD(tr, '—', '');
+    addTD(tr, '—', '');
+    addTD(tr, fmt(SIZES.reduce((a,s)=>a+(totals.l90[s]||0),0)), 'num');
+    addTD(tr, fmt(SIZES.reduce((a,s)=>a+(totals.lysal[s]||0),0)), 'num');
+    months.forEach(m => {
+      const mi = `month-${m.toLowerCase().slice(0,3)}`;
+      addTD(tr, fmt(Math.round(totals.monthProjSales[m])), mi+' num');
+      addTD(tr, '', mi); addTD(tr, '', mi);
+      addTD(tr, '—', mi);
+      addTD(tr, '—', mi);
+      SIZES.forEach(s => addTD(tr, fmt(totals.monthInv[m][s]||0), mi+' num'));
+      addTD(tr, fmt(Math.round(totals.monthInv[m].total)), mi+' num');
+      addTD(tr, fmt(Math.round(totals.monthOrderQty[m])), mi+' order-qty');
+      addTD(tr, '—', mi);
+      addTD(tr, '—', mi);
+      addTD(tr, '—', mi);
+    });
+  }
+
+  document.getElementById('sheetContent').innerHTML = '';
+  document.getElementById('sheetContent').appendChild(table);
+  document.getElementById('productCount').textContent = `(${products.length})`;
+  document.getElementById('bbProducts').textContent = products.length;
+  document.getElementById('bbInv').textContent = fmt(SIZES.reduce((a,s)=>a+(totals.inv[s]||0),0));
+  document.getElementById('bbSales').textContent = fmt(SIZES.reduce((a,s)=>a+(totals.sales[s]||0),0));
+  document.getElementById('bbOrder').textContent = fmt(Math.round(months.reduce((a,m)=>a+totals.monthOrderQty[m],0)));
+  updateSummary(products, months, totals);
+}
+
+function onCellEdit(e) {
+  const cell = e.target;
+  const { product, month, type } = cell.dataset;
+  const val = parseFloat(cell.textContent.replace('%',''));
+  if (!APP.overrides[product]) APP.overrides[product] = {};
+  if (!APP.overrides[product][month]) APP.overrides[product][month] = {};
+  if (!isNaN(val)) APP.overrides[product][month][type] = val;
+  else delete APP.overrides[product][month][type];
+  localStorage.setItem('ordersheet_overrides', JSON.stringify(APP.overrides));
+  buildSheet();
+}
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+function addTH(tr, text, cls='', colspan=1, rowspan=1) {
+  const th = document.createElement('th');
+  th.textContent = text; if(cls) th.className=cls;
+  if(colspan>1) th.colSpan=colspan; if(rowspan>1) th.rowSpan=rowspan;
+  tr.appendChild(th); return th;
+}
+function addTD(tr, text, cls='') {
+  const td = document.createElement('td');
+  td.textContent = text; if(cls) td.className=cls;
+  tr.appendChild(td); return td;
+}
+function fmt(n) { if(n===null||n===undefined||isNaN(n)) return '—'; if(n===0) return '-'; return Number(n).toLocaleString(); }
+function formatDate(d) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+// ══════════════════════════════════════════════════
+// PRESETS
+// ══════════════════════════════════════════════════
+function savePreset() {
+  const input = document.getElementById('presetNameInput');
+  const name = (input?.value || '').trim() || `${APP.sheet.category} ${new Date().toLocaleDateString()}`;
+  const preset = {
+    id: Date.now(), name, category: APP.sheet.category,
+    selectedProducts: APP.sheet.selectedProducts,
+    activeMonths: APP.sheet.activeMonths,
+    salesPeriod: document.getElementById('selSalesPeriod').value,
+    dos: document.getElementById('inpDOS').value,
+    stores: document.getElementById('inpStores').value,
+    overrides: JSON.parse(JSON.stringify(APP.overrides)),
+    createdAt: new Date().toISOString()
+  };
+  APP.presets.unshift(preset);
+  localStorage.setItem('ordersheet_presets', JSON.stringify(APP.presets));
+  if (input) input.value = '';
+  renderPresetsUI();
+  updatePresetSelect();
+  notify('Preset saved: ' + name, 'success');
+}
+
+function loadPreset() {
+  const id = parseInt(document.getElementById('selPreset').value);
+  if (!id) return;
+  const preset = APP.presets.find(p => p.id === id);
+  if (!preset) return;
+  APP.sheet.category = preset.category;
+  APP.sheet.selectedProducts = [...preset.selectedProducts];
+  APP.sheet.activeMonths = [...preset.activeMonths];
+  APP.overrides = preset.overrides || {};
+  document.getElementById('selCategory').value = preset.category;
+  document.getElementById('selSalesPeriod').value = preset.salesPeriod;
+  document.getElementById('inpDOS').value = preset.dos;
+  document.getElementById('inpStores').value = preset.stores;
+  renderMonthChips();
+  buildSheet();
+  notify('Preset loaded: ' + preset.name, 'success');
+}
+
+function deletePreset(id) {
+  APP.presets = APP.presets.filter(p=>p.id!==id);
+  localStorage.setItem('ordersheet_presets', JSON.stringify(APP.presets));
+  renderPresetsUI(); updatePresetSelect();
+}
+
+function renderPresetsUI() {
+  const list = document.getElementById('presetList');
+  if (!APP.presets.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px 0">No presets yet — set up your view and save it above</div>';
+    return;
+  }
+  list.innerHTML = '';
+  APP.presets.forEach(p => {
+    const isActive = APP.sheet.activePresetId === p.id;
+    const div = document.createElement('div');
+    div.className = 'preset-item' + (isActive ? ' active' : '');
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="preset-name">${p.name}</div>
+          <div class="preset-meta">${p.category||'—'} • ${p.selectedProducts?.length||0} products • ${(p.activeMonths||[]).join(', ')}</div>
+          <div class="preset-meta" style="margin-top:2px">${p.salesPeriod||'L30'} • DOS ${p.dos||30}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePreset(${p.id})" style="flex-shrink:0;margin-left:6px">✕</button>
+      </div>`;
+    div.onclick = () => loadPresetById(p.id);
+    div.title = 'Click to load';
+    div.style.cursor = 'pointer';
+    list.appendChild(div);
+  });
+  updatePresetSelect();
+}
+
+function loadPresetById(id) {
+  APP.sheet.activePresetId = id;
+  document.getElementById('selPreset').value = id;
+  loadPreset();
+  renderPresetsUI(); // refresh to show active highlight
+}
+
+function updatePresetSelect() {
+  const sel = document.getElementById('selPreset');
+  sel.innerHTML = '<option value="">— No Preset —</option>';
+  APP.presets.forEach(p => { const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+}
+
+// ══════════════════════════════════════════════════
+// HISTORY / SAVE
+// ══════════════════════════════════════════════════
+async function saveOrder() {
+  const orderDate = document.getElementById('selOrderDate').value;
+  const category = APP.sheet.category;
+  if (!category) { notify('Select a category first', 'error'); return; }
+  const year = new Date(orderDate).getFullYear();
+  const dateStr = orderDate.replace(/-/g,'.');
+  const filename = `${dateStr}-${category.replace(/\s+/g,'-')}-Order.json`;
+  const path = `Ordering Sheet/${category}/${year}/${filename}`;
+  const data = {
+    category, orderDate, selectedProducts: APP.sheet.selectedProducts,
+    activeMonths: APP.sheet.activeMonths, salesPeriod: document.getElementById('selSalesPeriod').value,
+    dos: document.getElementById('inpDOS').value, stores: document.getElementById('inpStores').value,
+    overrides: APP.overrides, savedAt: new Date().toISOString(), version: '1.0'
+  };
+
+  // Add to local history
+  const histEntry = { id: Date.now(), filename, path, category, orderDate, savedAt: data.savedAt };
+  APP.history.unshift(histEntry);
+  if (APP.history.length > 50) APP.history = APP.history.slice(0,50);
+  localStorage.setItem('ordersheet_history', JSON.stringify(APP.history));
+  localStorage.setItem('ordersheet_savedate_'+orderDate, new Date().toISOString());
+  renderHistoryUI();
+
+  // Save to GitHub if configured
+  if (APP.config.ghToken && APP.config.ghOwner && APP.config.ghRepo) {
+    try {
+      await saveToGitHub(path, JSON.stringify(data, null, 2));
+      notify(`Saved to GitHub: ${path}`, 'success');
+    } catch(e) {
+      notify(`GitHub save failed: ${e.message}. Saved locally.`, 'error');
+    }
+  } else {
+    localStorage.setItem('ordersheet_order_'+histEntry.id, JSON.stringify(data));
+    notify('Saved locally (configure GitHub to save to repo)', 'success');
+  }
+}
+
+async function saveToGitHub(path, content) {
+  const { ghToken, ghOwner, ghRepo, ghBranch } = APP.config;
+  const url = `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${encodeURIComponent(path)}`;
+  // Check if file exists (to get SHA)
+  let sha = null;
+  try {
+    const existing = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
+    if (existing.ok) { const d = await existing.json(); sha = d.sha; }
+  } catch {}
+  const body = { message: `Update ${path}`, content: btoa(unescape(encodeURIComponent(content))), branch: ghBranch };
+  if (sha) body.sha = sha;
+  const res = await fetch(url, { method: 'PUT', headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'GitHub API error'); }
+}
+
+async function loadFromGitHub(path) {
+  const { ghToken, ghOwner, ghRepo, ghBranch } = APP.config;
+  const url = `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${encodeURIComponent(path)}`;
+  const res = await fetch(url, { headers: ghToken ? { Authorization: `token ${ghToken}` } : {} });
+  if (!res.ok) throw new Error(`Not found: ${path}`);
+  const d = await res.json();
+  return JSON.parse(decodeURIComponent(escape(atob(d.content))));
+}
+
+function renderHistoryUI() {
+  const list = document.getElementById('historyList');
+  if (!APP.history.length) { list.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No saved orders yet</div>'; return; }
+  list.innerHTML = '';
+  APP.history.slice(0,20).forEach(h => {
+    const today = new Date().toISOString().split('T')[0];
+    const isToday = h.orderDate === today;
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<div class="history-date">${h.orderDate}${isToday?' <span style="color:var(--green);font-size:10px">TODAY</span>':''}</div>
+      <div class="history-meta">${h.category} • ${h.filename}</div>
+      <div class="history-actions">
+        <button class="btn btn-outline btn-sm" onclick="loadHistoryEntry(${h.id})">Load</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadHistoryExcel(${h.id})">Excel</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function loadHistoryEntry(id) {
+  const entry = APP.history.find(h=>h.id===id);
+  if (!entry) return;
+  let data;
+  if (APP.config.ghToken && APP.config.ghOwner) {
+    try { data = await loadFromGitHub(entry.path); } catch {}
+  }
+  if (!data) {
+    const local = localStorage.getItem('ordersheet_order_'+id);
+    if (local) data = JSON.parse(local);
+  }
+  if (!data) { notify('Could not load order data', 'error'); return; }
+
+  APP.sheet.category = data.category;
+  APP.sheet.selectedProducts = data.selectedProducts;
+  APP.sheet.activeMonths = data.activeMonths;
+  APP.overrides = data.overrides || {};
+  document.getElementById('selCategory').value = data.category;
+  document.getElementById('selSalesPeriod').value = data.salesPeriod;
+  document.getElementById('selOrderDate').value = data.orderDate;
+  document.getElementById('inpDOS').value = data.dos;
+  document.getElementById('inpStores').value = data.stores;
+
+  // Check if editable (only today)
+  const today = new Date().toISOString().split('T')[0];
+  APP.editableToday = (data.orderDate === today);
+  renderMonthChips();
+  buildSheet();
+  notify(`Loaded: ${entry.filename}`, 'success');
+}
+
+function downloadHistoryExcel(id) {
+  loadHistoryEntry(id).then(() => exportExcel());
+}
+
+// ══════════════════════════════════════════════════
+// EXCEL EXPORT (SheetJS)
+// ══════════════════════════════════════════════════
+function exportExcel() {
+  const orderDate = document.getElementById('selOrderDate').value;
+  const category = APP.sheet.category;
+  const products = APP.sheet.selectedProducts;
+  const months = APP.sheet.activeMonths;
+  const period = document.getElementById('selSalesPeriod').value;
+
+  if (!products.length) { notify('No products to export', 'error'); return; }
+  if (typeof XLSX === 'undefined') { notify('XLSX library not loaded', 'error'); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // ── SHEET 1: Main Order ──
+  const wsData = [];
+  // Title row
+  wsData.push([`${category} – Order Sheet ${formatDate(orderDate)}`]);
+  wsData.push([]);
+
+  // Headers
+  const hdrs = ['Product Name'];
+  SIZES.forEach(s=>hdrs.push(`Inv ${s}`)); hdrs.push('Total Inv');
+  hdrs.push(`${period} Sales`,'DOS','Est. Mo. Sales','L90','LY Sales');
+  months.forEach(m => {
+    hdrs.push(`${m} Proj.Sales`,`${m} Override`,`${m} Bump%`,`${m} Beg.Inv`,`${m} PO In`);
+    SIZES.forEach(s=>hdrs.push(`${m} Inv${s}`));
+    hdrs.push(`${m} Total Inv`,`${m} Order Qty`,`${m} DOS Thr`,`${m} LY MOM`,`${m} YOY%`);
+  });
+  wsData.push(hdrs);
+
+  const today = new Date(orderDate);
+  products.forEach(product => {
+    const invData = getInventoryForProduct(product);
+    const salesData = getSalesForProduct(product, period);
+    const l90Data = getSalesForProduct(product, 'L90');
+    const lyData = getHistoricalSalesForProduct(product, today.getFullYear()-1, today.getMonth()+1);
+    const sizeBreakdown = getSizeBreakdown(product, period);
+    const pos = getPOForProduct(product);
+    const estSales = estimateCurrentMonthSales(product, period, orderDate);
+    const invTotal = SIZES.reduce((s,sz) => s+(invData.onHand[sz]||0)+(invData.inTransit[sz]||0), 0);
+    const salesTotal = SIZES.reduce((s,sz) => s+(salesData[sz]||0), 0);
+    const l90Total = SIZES.reduce((s,sz) => s+(l90Data[sz]||0), 0);
+    const lyTotal = SIZES.reduce((s,sz) => s+(lyData[sz]||0), 0);
+    const dos = salesTotal > 0 ? parseFloat((getPeriodDays(period) * invTotal / salesTotal).toFixed(1)) : 0;
+
+    const row = [product];
+    SIZES.forEach(s=>row.push((invData.onHand[s]||0)+(invData.inTransit[s]||0)));
+    row.push(invTotal, salesTotal, dos, Math.round(estSales), l90Total, lyTotal);
+
+    let prevInv = invTotal; let prevSales = estSales;
+    months.forEach(m => {
+      const monthIdx = MONTHS_SHORT[m];
+      const lyM = getHistoricalSalesForProduct(product, today.getFullYear()-1, monthIdx+1);
+      const lyMTotal = SIZES.reduce((s,sz)=>s+(lyM[sz]||0),0);
+      const lyPrevM = getHistoricalSalesForProduct(product, today.getFullYear()-1, monthIdx);
+      const lyPrevTotal = SIZES.reduce((s,sz)=>s+(lyPrevM[sz]||0),0);
+      let projSales = calcProjectedSales(product, m, period, orderDate, prevSales);
+      const overrideSales = APP.overrides?.[product]?.[m]?.sales;
+      const bump = APP.overrides?.[product]?.[m]?.bump || 0;
+      let poInTotal = 0; const poBySize={};SIZES.forEach(s=>poBySize[s]=0);
+      pos.forEach(po => {
+        const lm = APP.overrides?.po?.[po.ref]?.landingMonth || calcLandingMonth(po.exf, po.mode);
+        if (lm===m) { SIZES.forEach(s=>{poBySize[s]+=(po.sizes[s]||0);}); poInTotal+=po.total; }
+      });
+      const projInv = calcProjectedInventory(product, m, prevInv, projSales, poInTotal);
+      const orderQty = calcOrderLanding(product, m, projInv, projSales);
+      const yoy = lyMTotal>0 ? parseFloat(((projSales-lyMTotal)/lyMTotal*100).toFixed(1)) : '';
+      const lyMOM = lyPrevTotal>0 ? parseFloat(((lyMTotal-lyPrevTotal)/lyPrevTotal*100).toFixed(1)) : '';
+      row.push(Math.round(projSales), overrideSales||'', bump||'', Math.round(prevInv), poInTotal);
+      SIZES.forEach(s=>row.push(Math.max(0,Math.round((invData.onHand[s]||0)+(invData.inTransit[s]||0)-Math.round(projSales*(sizeBreakdown[s]||0))+(poBySize[s]||0)))));
+      row.push(Math.round(projInv), Math.round(orderQty), Math.round(projSales/30*APP.config.dos+getOptimalForProduct(product)), lyMOM||'', yoy||'');
+      prevInv = projInv; prevSales = projSales;
+    });
+    wsData.push(row);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  // Style headers
+  ws['!cols'] = [{wch:30},...SIZES.map(()=>({wch:8})),{wch:8},{wch:10},{wch:6},{wch:12},{wch:8},{wch:10},...months.flatMap(()=>[{wch:12},{wch:10},{wch:7},{wch:10},{wch:8},...SIZES.map(()=>({wch:8})),{wch:10},{wch:10},{wch:10},{wch:10},{wch:8}])];
+  XLSX.utils.book_append_sheet(wb, ws, category.slice(0,31));
+
+  // ── SHEET 2: PO On Order ──
+  const poData = [['PO Reference','EXF Date','Mode','SKU','Product','Size','Qty','Landing Month','Category']];
+  (APP.derived.poOnOrder||[]).forEach(po => {
+    const info = APP.derived.skuMap?.[po.sku] || {};
+    if (info.category !== category) return;
+    const lm = APP.overrides?.po?.[po.ref]?.landingMonth || calcLandingMonth(po.exf, po.mode);
+    poData.push([po.ref, po.exf, po.mode, po.sku, info.parentName||'', info.size||'', po.qty, lm||'', info.category||'']);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(poData), 'PO On Order');
+
+  // ── SHEET 3: Size Breakdown ──
+  const sbData = [['Product','Size','Breakdown%',`${period} Sales`]];
+  products.forEach(p => {
+    const sb = getSizeBreakdown(p, period);
+    const sales = getSalesForProduct(p, period);
+    SIZES.forEach(s => sbData.push([p, s, (sb[s]*100).toFixed(1)+'%', sales[s]||0]));
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sbData), 'Size Breakdown');
+
+  // Download
+  const dateStr = orderDate.replace(/-/g,'');
+  const fname = `${dateStr}-${category.replace(/\s+/g,'-')}-Order.xlsx`;
+  XLSX.writeFile(wb, fname);
+  notify(`Downloaded: ${fname}`, 'success');
+}
+
+// ══════════════════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════════════════
+function updateSummary(products, months, totals) {
+  const content = document.getElementById('summaryContent');
+  let html = '';
+  months.forEach(m => {
+    html += `<div style="margin-bottom:12px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:4px;color:var(--accent)">${m}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px">
+        <div style="color:var(--text3)">Proj. Sales:</div><div style="text-align:right;font-family:monospace">${fmt(Math.round(totals.monthProjSales[m]))}</div>
+        <div style="color:var(--text3)">Proj. Inventory:</div><div style="text-align:right;font-family:monospace">${fmt(Math.round(totals.monthInv[m].total))}</div>
+        <div style="color:var(--text3)">Order Qty:</div><div style="text-align:right;font-family:monospace;color:var(--yellow);font-weight:600">${fmt(Math.round(totals.monthOrderQty[m]))}</div>
+      </div>
+    </div>`;
+  });
+  content.innerHTML = html;
+  document.getElementById('side-summary');
+}
+
+// ══════════════════════════════════════════════════
+// UI UTILITIES
+// ══════════════════════════════════════════════════
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+function showLoading(msg) { document.getElementById('loadingOverlay').classList.remove('hidden'); document.getElementById('loadingMsg').textContent = msg||'Loading...'; }
+function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+function setStatus(type, text) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot' + (type==='loading'?' loading':type==='error'?' error':'');
+  txt.textContent = text;
+  APP.connected = type === 'ok';
+}
+function notify(msg, type='info') {
+  const n = document.getElementById('notification');
+  n.textContent = msg; n.className = `notification ${type}`;
+  clearTimeout(n._t);
+  n._t = setTimeout(() => n.classList.add('hide'), 3500);
+}
+function switchSideTab(tab) {
+  ['presets','history','summary'].forEach(t => {
+    document.getElementById('side-'+t).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.sidebar-tab').forEach((el,i) => {
+    el.classList.toggle('active', ['presets','history','summary'][i]===tab);
+  });
+}
+</script>
+</body>
+</html>
