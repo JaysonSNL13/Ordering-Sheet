@@ -1,0 +1,16 @@
+{
+  "lastUpdated": "2026-04-13T15:44:12.102Z",
+  "files": [
+    "skus.json",
+    "inventory.json",
+    "po.json",
+    "optimal.json",
+    "sales_l30.json",
+    "sales_l60.json",
+    "sales_l90.json",
+    "historical.json",
+    "projections.json"
+  ],
+  "sheetId": "1AjBf2goCw0GuK2FzzyyLx-7qV1-HkOgZ8XEnZFDaIxc",
+  "sheetName": "Ordering Sheet Web App"
+}
