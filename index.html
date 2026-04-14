@@ -1,0 +1,3109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordering Sheet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+:root {
+  --bg:        #f0f2f5;
+  --bg2:       #ffffff;
+  --bg3:       #e4e6eb;
+  --bg4:       #d8dbe3;
+  --border:    #c5c9d4;
+  --border2:   #9ba3b5;
+  --accent:    #1d4ed8;
+  --accent2:   #3b82f6;
+  --accent-dim:rgba(29,78,216,0.10);
+  --green:     #15803d;
+  --green-dim: rgba(21,128,61,0.12);
+  --red:       #b91c1c;
+  --red-dim:   rgba(185,28,28,0.12);
+  --yellow:    #b45309;
+  --yellow-dim:rgba(180,83,9,0.12);
+  --purple:    #6d28d9;
+  --text:      #111827;
+  --text2:     #374151;
+  --text3:     #6b7280;
+  --header-h:  54px;
+  --row-h:     30px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+input, select, textarea, button { font-family: inherit; font-size: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* HEADER */
+.app-header {
+  height: var(--header-h); background: var(--bg2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; z-index: 100;
+}
+.logo { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; white-space: nowrap; }
+.logo span { color: var(--text2); font-weight: 400; }
+.hdr-sep { width: 1px; height: 24px; background: var(--border); }
+.hdr-ctrl { display: flex; align-items: center; gap: 6px; }
+.hdr-label { color: var(--text3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+select.hdr-select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 28px 4px 10px; border-radius: 6px; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6478'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; cursor: pointer;
+}
+select.hdr-select:focus { outline: none; border-color: var(--accent); }
+.btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; transition: all 0.15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.btn-green { background: var(--green); color: #0a1a12; font-weight: 600; }
+.btn-green:hover { filter: brightness(1.1); }
+.btn-danger { background: var(--red-dim); border: 1px solid var(--red); color: var(--red); }
+.btn-sm { padding: 3px 10px; font-size: 11px; }
+.hdr-spacer { flex: 1; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.status-dot.loading { background: var(--yellow); animation: pulse 1s infinite; }
+.status-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.status-text { font-size: 11px; color: var(--text3); }
+
+/* TOOLBAR */
+.toolbar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 8px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap;
+}
+.toolbar-group { display: flex; align-items: center; gap: 6px; }
+.tool-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
+select.tool-select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 28px 4px 8px; border-radius: 5px; appearance: none; font-size: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6478'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+}
+input.tool-input {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 8px; border-radius: 5px; font-size: 12px; width: 90px;
+}
+input.tool-input:focus, select.tool-select:focus { outline: none; border-color: var(--accent); }
+.month-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.month-chip {
+  padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); color: var(--text3); background: var(--bg3); transition: all 0.15s;
+}
+.month-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.tool-sep { width: 1px; height: 20px; background: var(--border); }
+
+/* MAIN LAYOUT */
+.app-body { flex: 1; display: flex; overflow: hidden; }
+.sheet-container { flex: 1; overflow: auto; position: relative; }
+
+/* TABLE */
+.ordering-table { border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 12px; white-space: nowrap; }
+.ordering-table th, .ordering-table td {
+  border: 1px solid var(--border); padding: 0 6px; height: var(--row-h); text-align: right;
+  min-width: 60px;
+}
+.ordering-table th { background: var(--bg3); color: var(--text2); font-weight: 600; font-size: 11px; text-align: center; position: sticky; top: 0; z-index: 10; }
+.col-product { text-align: left !important; min-width: 240px; white-space: nowrap; }
+th.col-product { }
+.ordering-table td.col-product { border-right: 1px solid var(--border); }
+
+/* Section headers */
+.section-header th { background: var(--bg4); border-top: 2px solid var(--border2); }
+.section-header .col-product { background: var(--bg4); }
+.section-title { background: var(--bg4) !important; color: var(--accent) !important; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+
+/* Month section colors */
+.month-feb th { background: #192840; } .month-feb .col-product { background: #192840; }
+.month-mar th { background: #1a2b1a; } .month-mar .col-product { background: #1a2b1a; }
+.month-apr th { background: #2a1f30; } .month-apr .col-product { background: #2a1f30; }
+.month-may th { background: #2a2818; } .month-may .col-product { background: #2a2818; }
+.month-jun th { background: #1a2830; } .month-jun .col-product { background: #1a2830; }
+.month-jul th { background: #281818; } .month-jul .col-product { background: #281818; }
+
+/* Data rows */
+.row-product td { background: var(--bg2); }
+.row-product:hover td { background: var(--bg3); }
+.row-grand-total td { background: var(--bg3); font-weight: 600; border-top: 2px solid var(--border2); }
+.row-grand-total td.col-product { background: var(--bg3); }
+
+/* Cell types */
+td.num { font-family: 'IBM Plex Mono', monospace; }
+td.num-pos { color: var(--green); }
+td.num-neg { color: var(--red); }
+td.num-zero { color: var(--text3); }
+td.pct { color: var(--yellow); }
+td.editable { background: var(--accent-dim) !important; cursor: text; }
+
+td.editable:focus { outline: 2px solid var(--accent); background: var(--bg4) !important; }
+td.override { background: var(--purple) !important; color: white !important; opacity: 0.9; }
+td.po-land { background: var(--green-dim) !important; }
+td.order-qty { background: var(--yellow-dim) !important; font-weight: 600; color: var(--yellow); }
+td.inv-low { color: var(--red) !important; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 280px; background: var(--bg2); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+}
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.sidebar-tab {
+  flex: 1; padding: 10px; text-align: center; font-size: 11px; font-weight: 600;
+  color: var(--text3); cursor: pointer; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.sidebar-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); background: var(--accent-dim); }
+.sidebar-content { flex: 1; overflow-y: auto; padding: 12px; }
+
+/* PANELS */
+.panel { margin-bottom: 16px; }
+.panel-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.field-group { margin-bottom: 10px; }
+.field-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.field-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 6px 10px; border-radius: 6px; font-size: 12px;
+}
+.field-input:focus { outline: none; border-color: var(--accent); }
+.field-input.small { padding: 4px 8px; font-size: 11px; }
+
+/* PRESET ITEMS */
+.preset-item {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.preset-item:hover { border-color: var(--accent); background: var(--bg4); }
+.preset-item.active { border-color: var(--accent); background: var(--accent-dim); }
+.preset-name { font-weight: 600; font-size: 12px; }
+.preset-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.preset-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* HISTORY ITEMS */
+.history-item {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px; margin-bottom: 8px;
+}
+.history-date { font-weight: 600; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+.history-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.history-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 24px; width: 520px; max-width: 95vw; max-height: 85vh; overflow-y: auto;
+}
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+.modal-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.modal-tab {
+  padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; color: var(--text3); transition: all 0.15s;
+}
+.modal-tab.active { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent); }
+.modal-section { display: none; }
+.modal-section.active { display: block; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+.alert { padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 12px; }
+.alert-info { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent2); }
+.alert-warn { background: var(--yellow-dim); border: 1px solid var(--yellow); color: var(--yellow); }
+
+/* MULTI SELECT */
+.multi-select { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; padding: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; }
+.multi-select label { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 4px; border-radius: 4px; cursor: pointer; }
+.multi-select label:hover { background: var(--bg4); }
+.multi-select input[type=checkbox] { accent-color: var(--accent); width: 13px; height: 13px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* LOADING */
+.loading-overlay { position: absolute; inset: 0; background: rgba(15,17,23,0.8); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.loading-overlay.hidden { display: none; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { margin-top: 12px; color: var(--text2); font-size: 13px; }
+
+/* TAGS */
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.tag-air { background: rgba(79,142,247,0.2); color: var(--accent2); border: 1px solid rgba(79,142,247,0.3); }
+.tag-sea { background: rgba(62,207,142,0.2); color: var(--green); border: 1px solid rgba(62,207,142,0.3); }
+
+/* TOOLTIP */
+[data-tip] { position: relative; }
+[data-tip]:hover::after {
+  content: attr(data-tip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: var(--bg4); color: var(--text); padding: 4px 8px; border-radius: 4px; font-size: 11px;
+  white-space: nowrap; z-index: 100; border: 1px solid var(--border2); pointer-events: none;
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  height: 36px; background: var(--bg2); border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0; font-size: 11px; color: var(--text3);
+}
+.bb-spacer { flex: 1; }
+.summary-pill { display: flex; align-items: center; gap: 5px; }
+.summary-val { font-family: 'IBM Plex Mono', monospace; color: var(--text); font-weight: 600; }
+
+/* NOTIFICATION */
+.notification {
+  position: fixed; bottom: 50px; right: 16px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 12px 16px; font-size: 12px; z-index: 500;
+  transform: translateY(0); opacity: 1; transition: all 0.3s; max-width: 280px;
+}
+.notification.success { border-color: var(--green); }
+.notification.error { border-color: var(--red); }
+.notification.hide { opacity: 0; transform: translateY(10px); pointer-events: none; }
+
+/* EXCEL-STYLE TAB BAR */
+.tab-bar {
+  display: flex; align-items: flex-end; gap: 2px;
+  background: var(--bg); border-bottom: 2px solid var(--border2);
+  padding: 0 12px; flex-shrink: 0; overflow-x: auto;
+}
+.excel-tab {
+  padding: 7px 18px; font-size: 12px; font-weight: 500; cursor: pointer;
+  border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+  color: var(--text3); background: var(--bg3); transition: all 0.15s; white-space: nowrap;
+  margin-bottom: -2px;
+}
+.excel-tab:hover { color: var(--text); background: var(--bg4); }
+.excel-tab.active { background: var(--bg2); color: var(--accent); border-color: var(--border2); font-weight: 600; }
+
+/* TAB PANELS */
+.tab-panel { display: none; flex: 1; overflow: hidden; flex-direction: row; }
+.tab-panel.active { display: flex; }
+
+/* SEARCHABLE SELECT */
+.ss-wrap { position: relative; }
+.ss-input {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  padding: 4px 28px 4px 10px; border-radius: 6px; font-size: 12px; width: 200px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a6478'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.ss-input:focus { outline: none; border-color: var(--accent); width: 240px; cursor: text; }
+.ss-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 220px; max-height: 260px;
+  overflow-y: auto; background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 6px; z-index: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  margin-top: 4px; display: none;
+}
+.ss-dropdown.open { display: block; }
+.ss-option {
+  padding: 8px 12px; font-size: 12px; cursor: pointer; transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.ss-option:last-child { border-bottom: none; }
+.ss-option:hover, .ss-option.selected { background: var(--accent-dim); color: var(--accent); }
+.ss-empty { padding: 12px; color: var(--text3); font-size: 12px; text-align: center; }
+
+/* DATA TABLE (shared across tabs) */
+.data-table { border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 12px; white-space: nowrap; }
+.data-table th, .data-table td {
+  border: 1px solid var(--border); padding: 4px 10px; text-align: right; height: 28px; min-width: 60px;
+}
+.data-table th { background: var(--bg3); color: var(--text2); font-weight: 600; font-size: 11px; text-align: center; position: sticky; top: 0; z-index: 5; }
+.data-table td:first-child { text-align: left; min-width: 200px; background: var(--bg2); position: sticky; left: 0; }
+.data-table th:first-child { text-align: left; background: var(--bg3); position: sticky; left: 0; z-index: 10; }
+.data-table tr:hover td { background: var(--bg3); }
+.data-table tr:hover td:first-child { background: var(--bg4); }
+.data-table .yr-header th { background: var(--bg4); color: var(--accent); font-size: 12px; }
+.data-table .total-row td { background: var(--bg3); font-weight: 600; border-top: 2px solid var(--border2); }
+.data-table .pct-cell { color: var(--yellow); }
+.data-table .hi-cell { color: var(--green); }
+.data-table .lo-cell { color: var(--red); }
+
+/* PO PILL */
+.po-pill {
+  display: inline-flex; align-items: center; gap: 5px; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 6px; font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="logo">Order<span>Sheet</span></div>
+  <div class="hdr-sep"></div>
+
+  <!-- Searchable Product Type -->
+  <div class="hdr-ctrl" style="position:relative">
+    <span class="hdr-label">Product Type</span>
+    <div class="ss-wrap" id="ss-type">
+      <input class="ss-input" id="ss-type-input" placeholder="Click or type to search…" autocomplete="off"
+        oninput="filterSS('type')" onfocus="openSS('type')" onclick="openSS('type')"
+        onblur="setTimeout(()=>closeSS('type'),200)" readonly
+        onfocus="this.removeAttribute('readonly');openSS('type')" style="cursor:pointer" />
+      <div class="ss-dropdown" id="ss-type-list"></div>
+    </div>
+  </div>
+
+  <!-- Searchable Parent Name -->
+  <div class="hdr-ctrl" style="position:relative">
+    <span class="hdr-label">Parent Name</span>
+    <div class="ss-wrap" id="ss-product">
+      <input class="ss-input" id="ss-product-input" placeholder="Click or type to search…" autocomplete="off"
+        oninput="filterSS('product')" onclick="openSS('product')"
+        onfocus="this.removeAttribute('readonly');openSS('product')" style="cursor:pointer" readonly />
+      <div class="ss-dropdown" id="ss-product-list"></div>
+    </div>
+  </div>
+
+  <!-- Size Filter -->
+  <div class="hdr-ctrl" style="position:relative">
+    <span class="hdr-label">Sizes</span>
+    <button id="sizePanelBtn" onclick="toggleSizePanel()"
+      style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;white-space:nowrap">
+      <span id="sizeFilterLabel">All Sizes ▾</span>
+    </button>
+  </div>
+
+  <div class="hdr-sep"></div>
+  <div class="hdr-ctrl">
+    <span class="hdr-label">Period</span>
+    <select class="hdr-select" id="selSalesPeriod" onchange="onPeriodChange()">
+      <option value="L30">L30</option>
+      <option value="L60">L60</option>
+      <option value="L90">L90</option>
+    </select>
+  </div>
+  <div class="hdr-ctrl">
+    <span class="hdr-label">Order Date</span>
+    <input type="date" class="hdr-select" id="selOrderDate" style="padding:4px 8px" />
+  </div>
+  <div class="hdr-spacer"></div>
+  <div id="statusArea" style="display:flex;align-items:center;gap:6px">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">Loading…</span>
+  </div>
+  <button class="btn btn-outline btn-sm" onclick="loadFromGitHubJSON()">⟳ Reload</button>
+  <button class="btn btn-green btn-sm" onclick="saveOrder()">💾 Save</button>
+  <button class="btn btn-primary btn-sm" onclick="exportExcel()">⬇ Excel</button>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar" id="tabBar">
+  <div class="excel-tab active" data-tab="order" onclick="switchTab('order')">
+    <span id="tabOrderLabel">Order Sheet</span>
+  </div>
+  <div class="excel-tab" data-tab="historical" onclick="switchTab('historical')">Historical MOM</div>
+  <div class="excel-tab" data-tab="projections" onclick="switchTab('projections')">Projections</div>
+  <div class="excel-tab" data-tab="sizeWise" onclick="switchTab('sizeWise')">Size Wise Breakdown</div>
+  <div class="excel-tab" data-tab="sizeAnalysis" onclick="switchTab('sizeAnalysis')">Size Breakdown Analysis</div>
+</div>
+
+
+<!-- PRODUCT PANEL (dropdown) -->
+<div id="productPanel" style="display:none;position:absolute;top:130px;left:16px;z-index:200;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:12px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+  <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+    <span style="font-weight:600;font-size:12px">Select Products</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-outline btn-sm" onclick="selectAllProducts()">All</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAllProducts()">None</button>
+    </div>
+  </div>
+  <div class="multi-select" id="productList"></div>
+  <div style="margin-top:8px;display:flex;justify-content:flex-end">
+    <button class="btn btn-primary btn-sm" onclick="applyProducts()">Apply</button>
+  </div>
+</div>
+
+<!-- SIZE FILTER PANEL -->
+<div id="sizePanel" style="display:none;position:fixed;top:58px;left:50%;transform:none;z-index:9999;background:var(--bg2);border:2px solid var(--border2);border-radius:10px;padding:16px;min-width:260px;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-weight:700;font-size:13px;color:var(--text)">Filter Sizes</span>
+    <div style="display:flex;gap:6px">
+      <button onclick="selectAllSizes()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:3px 10px;font-size:12px;cursor:pointer">All</button>
+      <button onclick="clearAllSizes()" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:3px 10px;font-size:12px;cursor:pointer">None</button>
+      <button onclick="document.getElementById('sizePanel').style.display='none'" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1">×</button>
+    </div>
+  </div>
+  <div id="sizeCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;max-width:320px;margin-bottom:12px"></div>
+  <div style="display:flex;justify-content:flex-end">
+    <button onclick="applySizes()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 18px;font-size:13px;font-weight:600;cursor:pointer">Apply</button>
+  </div>
+</div>
+
+<!-- MAIN BODY -->
+<div class="app-body">
+
+  <!-- ORDER SHEET TAB -->
+  <div class="tab-panel active" id="panel-order">
+    <div class="sheet-container" id="sheetContainer">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div style="text-align:center">
+          <div class="loading-spinner"></div>
+          <div class="loading-msg" id="loadingMsg">Loading data from GitHub...</div>
+        </div>
+      </div>
+      <div id="sheetContent" style="padding:0">
+        <div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3);flex-direction:column;gap:12px">
+          <div class="loading-spinner"></div>
+          <div style="font-size:13px;margin-top:12px">Loading data...</div>
+        </div>
+      </div>
+    </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-tabs">
+        <div class="sidebar-tab active" onclick="switchSideTab('presets')">Presets</div>
+        <div class="sidebar-tab" onclick="switchSideTab('history')">History</div>
+        <div class="sidebar-tab" onclick="switchSideTab('summary')">Summary</div>
+      </div>
+      <div class="sidebar-content">
+        <div id="side-presets">
+          <div class="panel">
+            <div class="panel-title">Save as Preset</div>
+            <div style="display:flex;gap:6px;margin-bottom:12px">
+              <input class="field-input" id="presetNameInput" placeholder="Preset name…" style="flex:1;padding:6px 10px;font-size:12px"
+                onkeydown="if(event.key==='Enter') savePreset()" />
+              <button class="btn btn-primary btn-sm" onclick="savePreset()" style="white-space:nowrap">+ Save</button>
+            </div>
+            <div class="panel-title" style="margin-top:4px">Saved Presets</div>
+            <div id="presetList"><div style="color:var(--text3);font-size:12px;text-align:center;padding:16px 0">No presets yet</div></div>
+          </div>
+        </div>
+        <div id="side-history" style="display:none">
+          <div class="panel">
+            <div class="panel-title">Order History</div>
+            <div id="historyList"><div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No saved orders yet</div></div>
+          </div>
+        </div>
+        <div id="side-summary" style="display:none">
+          <div class="panel">
+            <div class="panel-title">Order Summary</div>
+            <div id="summaryContent"><div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Generate sheet to see summary</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORICAL MOM TAB -->
+  <div class="tab-panel" id="panel-historical">
+    <div class="sheet-container">
+      <div id="historicalContent" style="padding:12px">
+        <div style="color:var(--text3);text-align:center;padding:40px">Select a product type to view Historical MOM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTIONS TAB -->
+  <div class="tab-panel" id="panel-projections">
+    <div class="sheet-container">
+      <div id="projectionsContent" style="padding:12px">
+        <div style="color:var(--text3);text-align:center;padding:40px">Loading projections...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZE WISE BREAKDOWN TAB -->
+  <div class="tab-panel" id="panel-sizeWise">
+    <div class="sheet-container">
+      <div id="sizeWiseContent" style="padding:12px">
+        <div style="color:var(--text3);text-align:center;padding:40px">Select a product to view Size Wise Breakdown</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZE BREAKDOWN ANALYSIS TAB -->
+  <div class="tab-panel" id="panel-sizeAnalysis">
+    <div class="sheet-container">
+      <div id="sizeAnalysisContent" style="padding:12px">
+        <div style="color:var(--text3);text-align:center;padding:40px">Select a product to view Size Breakdown Analysis</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="summary-pill">Products: <span class="summary-val" id="bbProducts">0</span></div>
+  <div class="summary-pill" style="margin-left:8px">Total Inv: <span class="summary-val" id="bbInv">—</span></div>
+  <div class="summary-pill" style="margin-left:8px">Monthly Sales: <span class="summary-val" id="bbSales">—</span></div>
+  <div class="summary-pill" style="margin-left:8px">Total Order: <span class="summary-val" id="bbOrder">—</span></div>
+  <div class="bb-spacer"></div>
+  <span id="lastUpdated" style="color:var(--text3)">Last updated: —</span>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification hide" id="notification"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// GLOBAL STATE
+// ══════════════════════════════════════════════════
+const APP = {
+  config: {
+    ghToken: '', ghOwner: 'jaysonsnl13', ghRepo: 'Ordering-Sheet', ghBranch: 'main',
+    skuTab: 'ALL SKU', invTab: 'INV', histTab: 'Historical MOM', projTab: 'Projections',
+    l30Tab: 'L30', l60Tab: 'L60', l90Tab: 'L90', poTab: 'PO On Order', optTab: 'Optimal Stocks',
+    dos: 30, salesPeriod: 'L30', seaDays: 45, airDays: 15, stores: 43
+  },
+  raw: { skus: [], inventory: [], po: [], l30: [], l60: [], l90: [], historical: [], projections: [], optimal: [] },
+  derived: { categories: [], productsByCategory: {}, skuMap: {}, lastInv: {}, lastInvDates: [] },
+  sheet: {
+    category: '', products: [], selectedProducts: [],
+    months: ['February','March','April','May','June','July'],
+    activeMonths: ['February','March','April','May'],
+    salesPeriod: 'L30', dos: 30, stores: 43,
+    orderDate: new Date().toISOString().split('T')[0]
+  },
+  calc: {},  // calculated data
+  overrides: {}, // { product: { month: { sales, bump, sizes }, po: { ref: landingMonth } } }
+  presets: [],
+  history: [],
+  editableToday: true,
+  connected: false
+};
+
+const SIZES = [36, 38, 40, 42, 44, 46, 48]; // default fallback
+
+// Dynamically compute sizes from SKU map for selected products
+function getAvailableSizes(products) {
+  const skuMap  = APP.derived.skuMap  || {};
+  const sizeSet = new Set();
+
+  // ── Source 1: skuMap (ALL SKU tab, col E) ──
+  (products || []).forEach(productName => {
+    Object.values(skuMap).forEach(info => {
+      if (info.parentName !== productName) return;
+      const s = info.size;
+      if (s === undefined || s === null) return;
+      const trimmed = String(s).trim();
+      if (trimmed) sizeSet.add(trimmed);
+    });
+  });
+
+  // ── Source 2: Sales data SKUs (L30/L60/L90) — infer size from SKU suffix ──
+  // e.g. SKU "DRS-WHITE-M" → size "M", "CHINO-32" → size "32"
+  if (!sizeSet.size) {
+    const salesData = APP.derived.sales?.L30 || APP.derived.sales?.L60 || APP.derived.sales?.L90 || {};
+    (products || []).forEach(productName => {
+      Object.entries(skuMap).forEach(([sku, info]) => {
+        if (info.parentName !== productName) return;
+        if (Object.prototype.hasOwnProperty.call(salesData, sku)) {
+          // SKU exists in sales — try to extract size from end of SKU
+          const parts = sku.split(/[-_]/);
+          const last = parts[parts.length - 1];
+          if (last && last.trim()) sizeSet.add(last.trim());
+        }
+      });
+    });
+  }
+
+  // ── Source 3: Historical MOM ── find SKUs for this product with any sales
+  if (!sizeSet.size) {
+    const hist = APP.derived.historical || {};
+    const productSKUs = new Set();
+    (products || []).forEach(productName => {
+      Object.entries(skuMap).forEach(([sku, info]) => {
+        if (info.parentName === productName) productSKUs.add(sku);
+      });
+    });
+    Object.values(hist).forEach(skuQtys => {
+      Object.keys(skuQtys).forEach(sku => {
+        if (!productSKUs.has(sku)) return;
+        const info = skuMap[sku];
+        const s = info?.size;
+        if (s !== undefined && s !== null && String(s).trim()) sizeSet.add(String(s).trim());
+      });
+    });
+  }
+
+  if (!sizeSet.size) {
+    console.warn('getAvailableSizes: no sizes found in skuMap for', products,
+      '— sample skuMap entries:', Object.values(skuMap).filter(x=>products.includes(x.parentName)).slice(0,3));
+    return SIZES; // last fallback
+  }
+
+  // Sort sizes
+  const arr = [...sizeSet];
+  const allNum = arr.every(s => !isNaN(parseFloat(s)) && isFinite(s));
+  if (allNum) return arr.map(Number).sort((a,b)=>a-b);
+  const alphaOrder = ['XXS','XS','S','M','L','XL','XXL','2XL','3XL','4XL','5XL','One Size'];
+  return arr.sort((a,b) => {
+    const aUp = String(a).toUpperCase(), bUp = String(b).toUpperCase();
+    const ai = alphaOrder.findIndex(x=>x===aUp), bi = alphaOrder.findIndex(x=>x===bUp);
+    if (ai>=0 && bi>=0) return ai-bi;
+    if (ai>=0) return -1; if (bi>=0) return 1;
+    return aUp.localeCompare(bUp);
+  });
+}
+const MONTHS_SHORT = {January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11};
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // ── Delegated handlers for PO override controls ──
+  document.getElementById('sheetContent').addEventListener('change', function(e) {
+    const sel = e.target.closest('.po-landing-sel');
+    const chk = e.target.closest('.po-excl-chk');
+    if (sel) setPOOverride(sel.dataset.ref, 'landing', sel.value);
+    else if (chk) setPOOverride(chk.dataset.ref, 'exclude', chk.checked);
+  });
+
+  // ── Delegated mousedown handler for all SS dropdowns ──
+  document.addEventListener('mousedown', function(e) {
+    const item = e.target.closest('.ss-item');
+    const action = e.target.closest('.ss-action');
+    if (item) {
+      e.preventDefault();
+      const id  = item.dataset.id;
+      const val = item.dataset.value;
+      if (id && val !== undefined) selectSS(id, val);
+      return;
+    }
+    if (action) {
+      e.preventDefault();
+      const act = action.dataset.action;
+      if (act === 'selectAll') selectAllProductsSS();
+      else if (act === 'clearAll') clearAllProductsSS();
+      return;
+    }
+    // Close product dropdown if clicking outside it
+    const productWrap = document.getElementById('ss-product');
+    const productList = document.getElementById('ss-product-list');
+    if (productList && productList.classList.contains('open')) {
+      if (!productWrap?.contains(e.target)) {
+        closeSS('product');
+      }
+    }
+  });
+
+  // Close size panel when clicking outside it
+  document.addEventListener('mousedown', function(e) {
+    const panel = document.getElementById('sizePanel');
+    const btn   = document.getElementById('sizePanelBtn');
+    if (panel && panel.style.display !== 'none') {
+      if (!panel.contains(e.target) && !(btn && btn.contains(e.target))) {
+        panel.style.display = 'none';
+      }
+    }
+  });
+  loadLocalConfig();
+  loadLocalData();
+  renderMonthChips();
+  document.getElementById('selOrderDate').value = APP.sheet.orderDate;
+  APP.config.dos = APP.config.dos; // DOS set via config
+  APP.config.stores = APP.config.stores; // Stores set via config
+  // Always load from GitHub on startup — settings only needed to change repo
+  loadFromGitHubJSON();
+});
+
+function loadLocalConfig() {
+  const saved = localStorage.getItem('ordersheet_config');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    // Only overwrite defaults if saved value is non-empty
+    Object.keys(parsed).forEach(k => {
+      if (parsed[k] !== '' && parsed[k] !== null && parsed[k] !== undefined) {
+        APP.config[k] = parsed[k];
+      }
+    });
+  }
+  const presets = localStorage.getItem('ordersheet_presets');
+  if (presets) APP.presets = JSON.parse(presets);
+  const history = localStorage.getItem('ordersheet_history');
+  if (history) APP.history = JSON.parse(history);
+  const overrides = localStorage.getItem('ordersheet_overrides');
+  if (overrides) APP.overrides = JSON.parse(overrides);
+}
+
+function loadLocalData() {
+  const data = localStorage.getItem('ordersheet_rawdata');
+  if (data) {
+    const parsed = JSON.parse(data);
+    Object.assign(APP.raw, parsed);
+    processRawData();
+  }
+}
+
+function saveLocalConfig() { localStorage.setItem('ordersheet_config', JSON.stringify(APP.config)); }
+
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// GOOGLE SHEETS API
+// ══════════════════════════════════════════════════
+async function fetchSheet(tabName, range = '') {
+  const id = APP.config.sheetId;
+  const key = APP.config.apiKey;
+  if (!id) throw new Error('No Sheet ID configured');
+  const r = range ? `${encodeURIComponent(tabName)}!${range}` : encodeURIComponent(tabName);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${r}${key ? '?key='+key : ''}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.values || [];
+}
+
+async function fetchAllData() {
+  setStatus('loading', 'Loading...');
+  showLoading('Connecting to Google Sheets...');
+  try {
+    const [skus, inv, historical, l30, l60, l90, po, optimal, proj] = await Promise.all([
+      fetchSheet(APP.config.skuTab).catch(()=>[]),
+      fetchSheet(APP.config.invTab).catch(()=>[]),
+      fetchSheet(APP.config.histTab).catch(()=>[]),
+      fetchSheet(APP.config.l30Tab).catch(()=>[]),
+      fetchSheet(APP.config.l60Tab).catch(()=>[]),
+      fetchSheet(APP.config.l90Tab).catch(()=>[]),
+      fetchSheet(APP.config.poTab).catch(()=>[]),
+      fetchSheet(APP.config.optTab).catch(()=>[]),
+      fetchSheet(APP.config.projTab).catch(()=>[])
+    ]);
+    APP.raw = { skus, inventory: inv, historical, l30, l60, l90, po, optimal, projections: proj };
+    localStorage.setItem('ordersheet_rawdata', JSON.stringify(APP.raw));
+    processRawData();
+    setStatus('ok', `Connected • ${new Date().toLocaleTimeString()}`);
+    document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+    notify('Data loaded successfully', 'success');
+  } catch(e) {
+    setStatus('error', 'Connection failed');
+    notify(`Error: ${e.message}`, 'error');
+    console.error(e);
+    // Use cached data if available
+    if (APP.raw.skus?.length > 0) processRawData();
+  }
+  hideLoading();
+}
+
+async function refreshData() { await fetchAllData(); recalcAll(); buildSheet(); }
+
+// Load from pre-built GitHub JSON (faster — no Sheets API needed)
+async function loadFromGitHubJSON() {
+  const { ghOwner, ghRepo, ghBranch, ghToken } = APP.config;
+  if (!ghOwner || !ghRepo) { setStatus('error', 'No repo configured'); hideLoading(); return; }
+
+  setStatus('loading', 'Loading...');
+  showLoading('Loading data from GitHub...');
+
+  // Strip .json extension from dataPath if user accidentally set "data.json" instead of "data"
+  const rawPath = (APP.config.dataPath || 'data').replace(/\.json$/i, '');
+  const base = `https://raw.githubusercontent.com/${ghOwner}/${ghRepo}/${ghBranch||'main'}/${rawPath}`;
+
+  // Show URL in status so user can verify
+  setStatus('loading', `Fetching ${ghOwner}/${ghRepo}…`);
+
+  // Helper: fetch with optional token fallback via GitHub API
+  const fetchJSON = async (filename) => {
+    const url = `${base}/${filename}`;
+    let res = await fetch(url);
+    if (!res.ok && ghToken) {
+      // Try via GitHub API (works for private repos)
+      const apiUrl = `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${rawPath}/${filename}`;
+      const apiRes = await fetch(apiUrl, { headers: { Authorization: `token ${ghToken}`, Accept: 'application/vnd.github.v3.raw' } });
+      if (apiRes.ok) return await apiRes.json();
+    }
+    if (!res.ok) {
+      if (res.status === 404) throw new Error(`File not found: ${rawPath}/${filename}\nURL tried: ${url}\n\nMake sure:\n1. Repo is PUBLIC, or add a GitHub Token\n2. Apps Script sync has been run at least once\n3. DATA_JSON_PATH in Script Properties is "data" (not "data.json")`);
+      throw new Error(`HTTP ${res.status} fetching ${filename}`);
+    }
+    return await res.json();
+  };
+
+  try {
+    const [skuRes, invRes, poRes, optRes, l30Res, l60Res, l90Res, histRes, projRes, lastInvRes] = await Promise.all([
+      fetchJSON('skus.json').catch(() => ({})),
+      fetchJSON('inventory.json').catch(() => ({})),
+      fetchJSON('po.json').catch(() => ({})),
+      fetchJSON('optimal.json').catch(() => ({})),
+      fetchJSON('sales_l30.json').catch(() => ({})),
+      fetchJSON('sales_l60.json').catch(() => ({})),
+      fetchJSON('sales_l90.json').catch(() => ({})),
+      fetchJSON('historical.json').catch(() => ({})),
+      fetchJSON('projections.json').catch(() => ({})),
+      fetchJSON('last_inv.json').catch(() => ({})),    // optional — synced separately
+    ]);
+
+    const d = APP.derived;
+    d.skuMap             = skuRes.bySKU    || {};
+    d.categories         = Object.keys(skuRes.byCategory || {});
+    d.productsByCategory = skuRes.byCategory || {};
+    d.inventory          = invRes.inventory || {};
+    d.invDateUpdated     = invRes.dateUpdated || null; // date from INV tab B1
+    d.poOnOrder          = (poRes.orders || []).map(o => ({ ...o, sizes: buildPOSizes(o.sku, poRes.orders, d.skuMap) }));
+    d.sales              = { L30: l30Res.sales||{}, L60: l60Res.sales||{}, L90: l90Res.sales||{} };
+    d.historical         = histRes.historical || {};
+    d.historicalByCategory   = histRes.byCategory    || {};
+    d.historicalByParentName = histRes.byParentName || {};
+    // Build parentName index for fast LY lookup
+    d.historicalByParentName = buildHistoricalByParentName(histRes.historical || {}, d.skuMap);
+    d.projections        = projRes.projections || {};
+    d.rawProjections     = projRes.rawTable    || null;
+    d.lastInv            = (lastInvRes && lastInvRes.lastInv)  || {};
+    d.lastInvDates       = (lastInvRes && lastInvRes.dates)    || [];
+    // Store raw projections table for the Projections tab
+    d.rawProjections     = projRes.rawTable || null;
+    d.optimalStock       = optRes.optimal || {};
+
+    const catCount  = d.categories.length;
+    const skuCount  = Object.keys(d.skuMap).length;
+
+    // Auto-set order date from INV tab B1 date if available
+    if (d.invDateUpdated) {
+      // Parse various date formats: "2026-04-13", "04/13/26", "04.13.26"
+      let parsedDate = null;
+      const s = String(d.invDateUpdated).trim();
+      // Try YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        parsedDate = s;
+      }
+      // Try MM/DD/YYYY or MM.DD.YYYY or MM/DD/YY or MM.DD.YY
+      const m = s.match(/^(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{2,4})$/);
+      if (m) {
+        const yr = m[3].length === 2 ? '20' + m[3] : m[3];
+        parsedDate = `${yr}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+      }
+      if (parsedDate) {
+        APP.sheet.orderDate = parsedDate;
+        const el = document.getElementById('selOrderDate');
+        if (el) el.value = parsedDate;
+      }
+    }
+
+    if (skuCount === 0) {
+      setStatus('error', `Connected but no SKU data found — check repo path`);
+      notify(`⚠️ Loaded but empty. Check: repo is public, DATA_JSON_PATH="data", sync was run.`, 'error');
+    } else {
+      setStatus('ok', `Loaded ${skuCount} SKUs • ${catCount} categories`);
+      document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleString()}`;
+      notify(`✅ ${skuCount} SKUs across ${catCount} categories loaded`, 'success');
+    }
+    updateCategorySelect();
+  } catch(e) {
+    setStatus('error', 'Load failed');
+    notify('❌ ' + e.message.split('\n')[0], 'error');
+    console.error(e.message);
+  }
+  hideLoading();
+}
+
+function buildPOSizes(sku, allOrders, skuMap) {
+  // Group qty by size for a given SKU reference
+  const sizes = {};
+  allOrders.filter(o => o.sku === sku).forEach(o => {
+    const size = parseInt(skuMap[o.sku]?.size);
+    if (!isNaN(size)) sizes[size] = (sizes[size]||0) + o.qty;
+  });
+  return sizes;
+}
+
+// ══════════════════════════════════════════════════
+// PROCESS RAW DATA
+// ══════════════════════════════════════════════════
+function processRawData() {
+  const { skus, inventory, po, l30, l60, l90, historical, projections, optimal } = APP.raw;
+  const d = APP.derived;
+
+  // SKU Map: SKU -> { parentName, category, size }
+  d.skuMap = {};
+  d.categories = [];
+  d.productsByCategory = {};
+  if (skus.length > 1) {
+    skus.slice(1).forEach(row => {
+      if (!row || !row[2]) return;
+      const parentName = (row[0]||'').trim();
+      const category = (row[1]||'').trim();
+      const sku = (row[2]||'').trim();
+      const size = (row[4]||'').trim();
+      if (!sku) return;
+      d.skuMap[sku] = { parentName, category, size };
+      if (category && !d.categories.includes(category)) d.categories.push(category);
+      if (category && parentName) {
+        if (!d.productsByCategory[category]) d.productsByCategory[category] = [];
+        if (!d.productsByCategory[category].includes(parentName)) d.productsByCategory[category].push(parentName);
+      }
+    });
+  }
+
+  // Inventory: SKU -> { onHand, inTransit }
+  d.inventory = {};
+  if (inventory.length > 2) {
+    inventory.slice(2).forEach(row => {
+      if (!row || !row[1]) return;
+      const sku = (row[1]||'').trim();
+      if (!sku) return;
+      d.inventory[sku] = { onHand: parseFloat(row[5])||0, inTransit: parseFloat(row[6])||0 };
+    });
+  }
+
+  // PO On Order
+  d.poOnOrder = [];
+  if (po.length > 1) {
+    po.slice(1).forEach(row => {
+      if (!row || !row[4]) return;
+      const sku = (row[4]||'').trim();
+      if (!sku) return;
+      d.poOnOrder.push({ sku, qty: parseFloat(row[6])||0, exf: row[8]||'', ref: row[9]||'', mode: detectMode(row[9]||'') });
+    });
+  }
+
+  // Sales
+  d.sales = { L30:{}, L60:{}, L90:{} };
+  [[l30,'L30'],[l60,'L60'],[l90,'L90']].forEach(([data, period]) => {
+    if (data.length > 1) {
+      data.slice(1).forEach(row => {
+        if (!row || !row[0]) return;
+        const sku = (row[0]||'').trim();
+        const qty = parseFloat(row[2])||0;
+        if (sku) d.sales[period][sku] = (d.sales[period][sku]||0) + qty;
+      });
+    }
+  });
+
+  // Historical MOM: { "YYYY-M": { sku: qty } }
+  // Columns: A=Month, B=SKU/Product Variant, C=Product Type, D=Net items sold
+  d.historical = {};
+  d.historicalByCategory = {};
+  if (historical.length > 1) {
+    historical.slice(1).forEach(row => {
+      if (!row || !row[0]) return;
+      const rawDate  = row[0];
+      const sku      = (row[1]||'').trim();   // col B: Product Variant / SKU
+      const category = (row[2]||'').trim();   // col C: Product Type
+      const qty      = parseFloat(row[3])||0; // col D: Net items sold
+      if (!sku || !qty) return;
+      if (!sku) return;
+      // Parse date — handles Date objects, "1/1/2022", "2022-01-01"
+      let dateKey = '';
+      if (rawDate instanceof Date) {
+        dateKey = `${rawDate.getFullYear()}-${rawDate.getMonth()+1}`;
+      } else if (typeof rawDate === 'string' && rawDate.includes('/')) {
+        const parts = rawDate.split('/');
+        if (parts.length === 3) dateKey = `${parts[2]}-${parseInt(parts[0])}`;
+      } else {
+        const parsed = new Date(rawDate);
+        if (!isNaN(parsed)) dateKey = `${parsed.getFullYear()}-${parsed.getMonth()+1}`;
+      }
+      if (!dateKey) return;
+      // SKU-level
+      if (!d.historical[dateKey]) d.historical[dateKey] = {};
+      d.historical[dateKey][sku] = (d.historical[dateKey][sku]||0) + qty;
+      // Category-level (for YOY and projections)
+      if (category) {
+        if (!d.historicalByCategory[dateKey]) d.historicalByCategory[dateKey] = {};
+        d.historicalByCategory[dateKey][category] = (d.historicalByCategory[dateKey][category]||0) + qty;
+      }
+    });
+  }
+
+  // Projections: { year: { category: { month: qty } } }
+  d.projections = {};
+  if (projections.length > 2) {
+    const year = projections[0]?.[0] || new Date().getFullYear();
+    const months = projections[1]?.slice(1) || [];
+    projections.slice(2).forEach(row => {
+      if (!row || !row[0]) return;
+      const category = (row[0]||'').trim();
+      if (!d.projections[year]) d.projections[year] = {};
+      if (!d.projections[year][category]) d.projections[year][category] = {};
+      months.forEach((m,i) => {
+        if (m) d.projections[year][category][m] = parseFloat(row[i+1])||0;
+      });
+    });
+  }
+
+  // Optimal Stock: { sku: { size: qty, total: qty } }
+  d.optimalStock = {};
+  if (optimal.length > 1) {
+    optimal.slice(1).forEach(row => {
+      if (!row || !row[1]) return;
+      const sku = (row[1]||'').trim();
+      const qty = parseFloat(row[2])||0;
+      d.optimalStock[sku] = (d.optimalStock[sku]||0) + qty;
+    });
+  }
+
+  updateCategorySelect();
+  renderPresetsUI();
+  renderHistoryUI();
+}
+
+function detectMode(ref) {
+  const r = ref.toLowerCase();
+  if (r.includes('air')) return 'Air';
+  return 'Sea';
+}
+
+// ══════════════════════════════════════════════════
+// UI SETUP
+// ══════════════════════════════════════════════════
+function updateCategorySelect() {
+  const cats = APP.derived.categories || [];
+  SS.type.options = cats;
+  renderSSOptions('type');
+  // Auto-select first category
+  if (!SS.type.value && cats.length > 0) {
+    selectSS('type', cats[0]);
+  } else if (SS.type.value) {
+    // Refresh product list
+    SS.product.options = APP.derived.productsByCategory[SS.type.value] || [];
+    renderSSOptions('product');
+    buildSheet();
+  }
+}
+
+
+// ══════════════════════════════════════════════════
+// SEARCHABLE SELECT
+// ══════════════════════════════════════════════════
+const SS = { type: { value: '', options: [] }, product: { value: '', options: [] } };
+
+function initSearchableSelects() {
+  SS.type.options = APP.derived.categories || [];
+  renderSSOptions('type');
+  SS.product.options = [];
+  renderSSOptions('product');
+}
+
+function filterSS(id) {
+  const q = document.getElementById(`ss-${id}-input`).value.toLowerCase().trim();
+  const list = document.getElementById(`ss-${id}-list`);
+  // Show all options when empty, filter when typing
+  const opts = q ? SS[id].options.filter(o => o.toLowerCase().includes(q)) : SS[id].options;
+  if (!opts.length) {
+    list.innerHTML = '<div class="ss-empty">No results</div>';
+  } else {
+    list.innerHTML = opts.map(o =>
+      `<div class="ss-option ss-item${o===SS[id].value?' selected':''}" data-id="${id}" data-value="${o.replace(/"/g,'&quot;')}"> ${o}</div>`
+    ).join('');
+    // Scroll selected into view
+    const sel = list.querySelector('.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function renderSSOptions(id) {
+  const list = document.getElementById(`ss-${id}-list`);
+  if (!list) return;
+  list.innerHTML = SS[id].options.length
+    ? SS[id].options.map(o => `<div class="ss-option ss-item${o===SS[id].value?' selected':''}" data-id="${id}" data-value="${o.replace(/"/g,'&quot;')}"> ${o}</div>`).join('')
+    : '<div class="ss-empty">No options</div>';
+}
+
+function openSS(id) {
+  const input = document.getElementById(`ss-${id}-input`);
+  if (!input) return;
+  const list = document.getElementById(`ss-${id}-list`);
+  const opts = SS[id].options;
+  if (id === 'product') {
+    if (!SS.product.selected) SS.product.selected = new Set();
+    list.innerHTML = `<div class="ss-option ss-action" data-action="selectAll" style="border-bottom:2px solid var(--border2);color:var(--accent)">☑ Select All</div>
+      <div class="ss-option ss-action" data-action="clearAll" style="border-bottom:2px solid var(--border2);color:var(--red)">☐ Clear All</div>` +
+      (opts.length
+        ? opts.map(o => `<div class="ss-option ss-item" data-id="product" data-value="${o.replace(/"/g,'&quot;')}">
+            <span style="margin-right:8px;color:var(--accent)">${SS.product.selected.has(o)?'☑':'☐'}</span>${o}
+          </div>`).join('')
+        : '<div class="ss-empty">No products loaded</div>');
+  } else {
+    list.innerHTML = opts.length
+      ? opts.map(o => `<div class="ss-option ss-item${o===SS[id].value?' selected':''}" data-id="${id}" data-value="${o.replace(/"/g,'&quot;')}"><span style="color:var(--accent);margin-right:6px;width:14px;display:inline-block">${o===SS[id].value?'✓':''}</span>${o}</div>`).join('')
+      : '<div class="ss-empty">No options loaded yet</div>';
+  }
+  list.classList.add('open');
+  setTimeout(() => { input.removeAttribute('readonly'); input.style.cursor='text'; }, 0);
+}
+
+function selectAllProductsSS() {
+  if (!SS.product.selected) SS.product.selected = new Set();
+  SS.product.options.forEach(o => SS.product.selected.add(o));
+  const input = document.getElementById('ss-product-input');
+  if (input) input.value = `All (${SS.product.selected.size})`;
+  APP.sheet.selectedProducts = [...SS.product.selected];
+  closeSS('product');
+  buildSheet();
+}
+
+function clearAllProductsSS() {
+  SS.product.selected = new Set();
+  const input = document.getElementById('ss-product-input');
+  if (input) { input.value = ''; input.placeholder = `— Pick products (${SS.product.options.length} available) —`; }
+  APP.sheet.selectedProducts = [];
+  closeSS('product');
+  const container = document.getElementById('sheetContent');
+  if (container) container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:10px;color:var(--text3)">
+    <div style="font-size:28px">👆</div>
+    <div style="font-size:13px">Select products from the <b style="color:var(--accent)">Parent Name</b> dropdown</div>
+  </div>`;
+}
+function closeSS(id) {
+  document.getElementById(`ss-${id}-list`).classList.remove('open');
+}
+
+function selectSS(id, value) {
+  if (id === 'product') {
+    if (!SS.product.selected) SS.product.selected = new Set();
+    if (SS.product.selected.has(value)) SS.product.selected.delete(value);
+    else SS.product.selected.add(value);
+    const sel = [...SS.product.selected];
+    SS.product.value = sel.join(', ');
+    const input = document.getElementById('ss-product-input');
+    if (input) input.value = sel.length===0 ? '' : sel.length===1 ? sel[0] : `${sel.length} selected`;
+    APP.sheet.selectedProducts = sel;
+    openSS('product'); // keep open for multi-select
+
+    if (sel.length > 0) {
+      APP._buildPending = true;
+      setTimeout(() => {
+        try {
+          buildSheet();
+        } catch(err) {
+          console.error('buildSheet error:', err);
+          const c = document.getElementById('sheetContent');
+          if(c) c.innerHTML = `<div style="padding:20px;color:red">Error: ${err.message}<br>Check browser console (F12) for details.</div>`;
+        } finally {
+          APP._buildPending = false;
+        }
+      }, 0);
+    }
+    return;
+  }
+  SS[id].value = value;
+  const input = document.getElementById(`ss-${id}-input`);
+  input.value = value;
+  input.setAttribute('readonly', true);
+  input.style.cursor = 'pointer';
+  closeSS(id);
+  if (id === 'type') {
+    SS.product.options = APP.derived.productsByCategory[value] || [];
+    SS.product.value = '';
+    SS.product.selected = new Set(); // clear selection
+    const pi = document.getElementById('ss-product-input');
+    if(pi) { pi.value = ''; pi.placeholder = `— Pick products (${SS.product.options.length} available) —`; }
+    renderSSOptions('product');
+    APP.sheet.category = value;
+    APP.sheet.selectedProducts = []; // none selected — user must pick
+    APP.sheet.selectedSizes = null;  // reset sizes — will auto-detect from new category
+    // Reset size filter label
+    const lbl = document.getElementById('sizeFilterLabel');
+    if (lbl) lbl.textContent = 'All Sizes ▾';
+    // Update tab label
+    const dateStr = (document.getElementById('selOrderDate')?.value || new Date().toISOString().split('T')[0]).replace(/-/g,'.');
+    document.getElementById('tabOrderLabel').textContent = `${dateStr.slice(2)} ${value} Order`;
+    // Show prompt instead of building
+    const container = document.getElementById('sheetContent');
+    if (container) container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:10px;color:var(--text3)">
+      <div style="font-size:28px">👆</div>
+      <div style="font-size:13px">Select products from the <b style="color:var(--accent)">Parent Name</b> dropdown to build the sheet</div>
+      <div style="font-size:11px">${SS.product.options.length} products available in ${value}</div>
+    </div>`;
+  } else if (id === 'product') {
+    APP.sheet.selectedProducts = value ? [value] : [];
+    // Update size filter to show available sizes for newly selected products
+    if (APP.sheet.selectedProducts.length > 0) {
+      // Don't reset selectedSizes here — let buildSheet validate and reset if needed
+      const lbl = document.getElementById('sizeFilterLabel');
+      if (lbl && !APP.sheet.selectedSizes) lbl.textContent = 'All Sizes ▾';
+    }
+    buildSheet();
+    renderTabContent(APP.currentTab || 'order');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════
+APP.currentTab = 'order';
+
+function switchTab(tab) {
+  APP.currentTab = tab;
+  document.querySelectorAll('.excel-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.toggle('active', el.id === `panel-${tab}`));
+  renderTabContent(tab);
+}
+
+function renderTabContent(tab) {
+  if (tab === 'order') { buildSheet(); return; }
+  if (tab === 'historical') renderHistoricalMOM();
+  if (tab === 'projections') renderProjections();
+  if (tab === 'sizeWise') renderSizeWise();
+  if (tab === 'sizeAnalysis') renderSizeAnalysis();
+}
+
+// ══════════════════════════════════════════════════
+// HISTORICAL MOM TAB
+// ══════════════════════════════════════════════════
+function renderHistoricalMOM() {
+  const container = document.getElementById('historicalContent');
+  const products = SS.product.value
+    ? [SS.product.value]
+    : (APP.derived.productsByCategory[SS.type.value] || []);
+
+  if (!products.length) {
+    container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:40px">Select a Product Type to view Historical MOM</div>';
+    return;
+  }
+
+  const hist = APP.derived.historical || {};
+  // Collect all date keys and sort
+  const allKeys = Object.keys(hist).sort((a,b) => {
+    const [ay,am] = a.split('-').map(Number);
+    const [by,bm] = b.split('-').map(Number);
+    return ay !== by ? ay-by : am-bm;
+  });
+
+  // Group by year
+  const byYear = {};
+  allKeys.forEach(key => {
+    const [y] = key.split('-');
+    if (!byYear[y]) byYear[y] = [];
+    byYear[y].push(key);
+  });
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let html = `<div style="overflow:auto;max-height:calc(100vh - 130px)">
+    <table class="data-table ordering-table">`;
+
+  Object.entries(byYear).forEach(([year, keys]) => {
+    // Year header
+    const monthCols = keys.map(k => {
+      const m = parseInt(k.split('-')[1]) - 1;
+      return MONTHS[m];
+    });
+    html += `<thead><tr class="yr-header">
+      <th class="col-product">${year} Sales</th>
+      ${monthCols.map(m=>`<th>${m}</th>`).join('')}
+      <th>Total</th>
+    </tr></thead><tbody>`;
+
+    let yearTotals = {};
+    keys.forEach(k => yearTotals[k] = 0);
+    let grandTotal = 0;
+
+    products.forEach(product => {
+      const vals = keys.map(key => {
+        // Sum across all SKUs for this product
+        let total = 0;
+        Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+          if (info.parentName === product) total += (hist[key]?.[sku] || 0);
+        });
+        return total;
+      });
+      const rowTotal = vals.reduce((a,b)=>a+b,0);
+      vals.forEach((v,i) => yearTotals[keys[i]] += v);
+      grandTotal += rowTotal;
+
+      html += `<tr>
+        <td class="col-product" title="${product}">${product.length > 35 ? product.slice(0,35)+'…' : product}</td>
+        ${vals.map(v=>`<td class="${v===0?'num-zero':''}">${v===0?'-':v.toLocaleString()}</td>`).join('')}
+        <td style="font-weight:600">${rowTotal.toLocaleString()}</td>
+      </tr>`;
+    });
+
+    // Year total row
+    if (products.length > 1) {
+      html += `<tr class="total-row">
+        <td class="col-product">Total</td>
+        ${keys.map(k=>`<td>${(yearTotals[k]||0).toLocaleString()}</td>`).join('')}
+        <td>${grandTotal.toLocaleString()}</td>
+      </tr>`;
+    }
+    html += '</tbody>';
+  });
+
+  html += '</table></div>';
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// PROJECTIONS TAB
+// ══════════════════════════════════════════════════
+function renderProjections() {
+  const container = document.getElementById('projectionsContent');
+  const proj = APP.derived.rawProjections || {};
+  if (!proj.headers) {
+    container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:40px">No projection data loaded</div>';
+    return;
+  }
+
+  const { title, headers, rows } = proj;
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let html = `<div style="overflow:auto;max-height:calc(100vh - 130px)">`;
+  if (title) html += `<div style="font-size:13px;font-weight:600;color:var(--accent);padding:8px 4px 12px">${title}</div>`;
+  html += `<table class="data-table ordering-table">
+    <thead><tr>
+      <th class="col-product">Year / Scenario</th>
+      ${headers.map(h=>`<th>${h}</th>`).join('')}
+    </tr></thead><tbody>`;
+
+  rows.forEach((row, i) => {
+    const isTotal = row.label?.toLowerCase().includes('total');
+    html += `<tr${isTotal?' class="total-row"':''}>
+      <td class="col-product">${row.label || ''}</td>
+      ${row.values.map(v => {
+        const n = parseFloat(v);
+        return `<td class="${isNaN(n)||n===0?'num-zero':''}">${isNaN(n)||n===0?'-':Math.round(n).toLocaleString()}</td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// SIZE WISE BREAKDOWN TAB
+// ══════════════════════════════════════════════════
+function renderSizeWise() {
+  const container = document.getElementById('sizeWiseContent');
+  const products = SS.product.value
+    ? [SS.product.value]
+    : (APP.derived.productsByCategory[SS.type.value] || []);
+
+  if (!products.length) {
+    container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:40px">Select a Product Type to view Size Wise Breakdown</div>';
+    return;
+  }
+
+  const period = document.getElementById('selSalesPeriod')?.value || 'L30';
+  // SIZES comes from global or caller
+
+  let html = `<div style="overflow:auto;max-height:calc(100vh - 130px)">
+    <table class="data-table ordering-table">
+    <thead><tr>
+      <th class="col-product">Product</th>
+      ${SIZES.map(s=>`<th>${s}</th>`).join('')}
+      <th>Total</th>
+      ${SIZES.map(s=>`<th style="color:var(--yellow)">${s}%</th>`).join('')}
+    </tr></thead><tbody>`;
+
+  let totals = {}; SIZES.forEach(s=>totals[s]=0); let grandTotal=0;
+
+  products.forEach(product => {
+    const sales = getSalesForProduct(product, period);
+    const total = SIZES.reduce((a,s)=>a+(sales[s]||0),0);
+    SIZES.forEach(s=>totals[s]+=(sales[s]||0));
+    grandTotal += total;
+
+    html += `<tr>
+      <td class="col-product" title="${product}">${product.length>35?product.slice(0,35)+'…':product}</td>
+      ${SIZES.map(s=>`<td class="${!sales[s]?'num-zero':''}">${sales[s]||0 ? sales[s].toLocaleString() : '-'}</td>`).join('')}
+      <td style="font-weight:600">${total.toLocaleString()}</td>
+      ${SIZES.map(s=>{
+        const pct = total>0 ? ((sales[s]||0)/total*100).toFixed(1) : '0.0';
+        return `<td class="pct-cell">${pct}%</td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  // Average row
+  if (products.length > 1) {
+    html += `<tr class="total-row">
+      <td class="col-product">Average / Total</td>
+      ${SIZES.map(s=>`<td>${totals[s].toLocaleString()}</td>`).join('')}
+      <td>${grandTotal.toLocaleString()}</td>
+      ${SIZES.map(s=>{
+        const pct = grandTotal>0 ? (totals[s]/grandTotal*100).toFixed(1) : '0.0';
+        return `<td class="pct-cell">${pct}%</td>`;
+      }).join('')}
+    </tr>`;
+  }
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// SIZE BREAKDOWN ANALYSIS TAB
+// ══════════════════════════════════════════════════
+function renderSizeAnalysis() {
+  const container = document.getElementById('sizeAnalysisContent');
+  const products = SS.product.value
+    ? [SS.product.value]
+    : (APP.derived.productsByCategory[SS.type.value] || []);
+
+  if (!products.length) {
+    container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:40px">Select a Product Type to view Size Breakdown Analysis</div>';
+    return;
+  }
+
+  // SIZES comes from global or caller
+  // Show breakdown across all 3 periods for comparison
+  let html = `<div style="overflow:auto;max-height:calc(100vh - 130px)">
+    <table class="data-table ordering-table">
+    <thead>
+      <tr>
+        <th class="col-product" rowspan="2">Product</th>
+        <th colspan="7" style="background:#192840;color:var(--accent)">L30 Sales</th>
+        <th colspan="7" style="background:#1a2b1a;color:var(--green)">L60 Sales</th>
+        <th colspan="7" style="background:#2a1f30;color:var(--purple)">L90 Sales</th>
+      </tr>
+      <tr>
+        ${['L30','L60','L90'].map(()=>SIZES.map(s=>`<th>${s}</th>`).join('')).join('')}
+      </tr>
+    </thead><tbody>`;
+
+  products.forEach(product => {
+    const s30 = getSalesForProduct(product,'L30');
+    const s60 = getSalesForProduct(product,'L60');
+    const s90 = getSalesForProduct(product,'L90');
+    const t30 = SIZES.reduce((a,s)=>a+(s30[s]||0),0);
+    const t60 = SIZES.reduce((a,s)=>a+(s60[s]||0),0);
+    const t90 = SIZES.reduce((a,s)=>a+(s90[s]||0),0);
+
+    html += `<tr>
+      <td class="col-product" title="${product}">${product.length>35?product.slice(0,35)+'…':product}</td>
+      ${SIZES.map(s=>{
+        const pct = t30>0?((s30[s]||0)/t30*100).toFixed(1):'0.0';
+        return `<td class="pct-cell">${pct}%</td>`;
+      }).join('')}
+      ${SIZES.map(s=>{
+        const pct = t60>0?((s60[s]||0)/t60*100).toFixed(1):'0.0';
+        return `<td class="pct-cell" style="color:var(--green)">${pct}%</td>`;
+      }).join('')}
+      ${SIZES.map(s=>{
+        const pct = t90>0?((s90[s]||0)/t90*100).toFixed(1):'0.0';
+        return `<td class="pct-cell" style="color:var(--purple)">${pct}%</td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  // Average row
+  html += '<tr class="total-row"><td class="col-product">Average</td>';
+  ['L30','L60','L90'].forEach(period => {
+    const combined = {}; SIZES.forEach(s=>combined[s]=0); let tot=0;
+    products.forEach(p => {
+      const sal = getSalesForProduct(p,period);
+      const t = SIZES.reduce((a,s)=>a+(sal[s]||0),0);
+      tot+=t; SIZES.forEach(s=>combined[s]+=(sal[s]||0));
+    });
+    html += SIZES.map(s=>{
+      const pct = tot>0?(combined[s]/tot*100).toFixed(1):'0.0';
+      return `<td class="pct-cell">${pct}%</td>`;
+    }).join('');
+  });
+  html += '</tr></tbody></table></div>';
+  container.innerHTML = html;
+}
+
+
+function onCategoryChange() {
+  // Now driven by searchable select — kept for compat
+  buildSheet();
+}
+
+function onPeriodChange() {
+  APP.sheet.salesPeriod = document.getElementById('selSalesPeriod').value;
+  recalcAll(); buildSheet();
+}
+
+function renderProductList() {
+  const products = APP.sheet.products;
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  products.forEach(p => {
+    const lbl = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = p; cb.checked = APP.sheet.selectedProducts.includes(p);
+    cb.onchange = () => {};
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' ' + p));
+    list.appendChild(lbl);
+  });
+}
+
+function selectAllProducts() { document.querySelectorAll('#productList input').forEach(cb => cb.checked = true); }
+function clearAllProducts() { document.querySelectorAll('#productList input').forEach(cb => cb.checked = false); }
+function applyProducts() {
+  APP.sheet.selectedProducts = Array.from(document.querySelectorAll('#productList input:checked')).map(cb=>cb.value);
+  document.getElementById('productPanel').style.display = 'none';
+  document.getElementById('productCount').textContent = `(${APP.sheet.selectedProducts.length})`;
+  buildSheet();
+}
+function toggleProductPanel() {
+  const p = document.getElementById('productPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  renderProductList();
+}
+
+function renderMonthChips() {
+  // Month chips moved inline — no separate element needed
+}
+
+function toggleMonth(m, el) {
+  if (APP.sheet.activeMonths.includes(m)) {
+    if (APP.sheet.activeMonths.length > 1) APP.sheet.activeMonths = APP.sheet.activeMonths.filter(x=>x!==m);
+  } else { APP.sheet.activeMonths.push(m); }
+  el.classList.toggle('active', APP.sheet.activeMonths.includes(m));
+  buildSheet();
+}
+
+// ══════════════════════════════════════════════════
+// CALCULATIONS ENGINE
+// ══════════════════════════════════════════════════
+function getInventoryForProduct(productName, _sizes) {
+  const sz = _sizes || SIZES;
+  const inv = { onHand: {}, inTransit: {} };
+  sz.forEach(s => { inv.onHand[s] = 0; inv.inTransit[s] = 0; });
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    const rawSize = String(info.size || '').trim();
+    const matched = sz.find(s => String(s).trim() === rawSize
+      || (parseFloat(s) === parseFloat(rawSize) && !isNaN(parseFloat(s))));
+    if (matched === undefined) return;
+    const invData = APP.derived.inventory?.[sku] || { onHand:0, inTransit:0 };
+    inv.onHand[matched]    = (inv.onHand[matched]||0)    + invData.onHand;
+    inv.inTransit[matched] = (inv.inTransit[matched]||0) + invData.inTransit;
+  });
+  return inv;
+}
+
+function getSalesForProduct(productName, period, _sizes) {
+  const sz = _sizes || SIZES;
+  const sales = {};
+  sz.forEach(s => sales[s] = 0);
+  const salesData = APP.derived.sales?.[period] || {};
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    // Match size regardless of type (numeric or string)
+    const rawSize = String(info.size || '').trim();
+    const matched = sz.find(s => String(s).trim() === rawSize
+      || (parseFloat(s) === parseFloat(rawSize) && !isNaN(parseFloat(s))));
+    if (matched === undefined) return;
+    sales[matched] = (sales[matched]||0) + (salesData[sku]||0);
+  });
+  return sales;
+}
+
+// Get historical total sales for a product in a given year/month
+// Tries 3 paths: 1) SKU→size map  2) direct parentName key  3) byParentName index
+function getHistoricalSalesForProduct(productName, year, month) {
+  const key  = `${year}-${month}`;
+  const hist = APP.derived.historical?.[key] || {};
+  const sales = {};
+  SIZES.forEach(s => sales[s] = 0);
+
+  // ── Path 1: SKU-level lookup (SKU → parentName + size via skuMap) ──
+  let found = false;
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    const qty = hist[sku];
+    if (!qty) return;
+    found = true;
+    const size = parseInt(info.size);
+    if (SIZES.includes(size)) sales[size] = (sales[size]||0) + qty;
+    else {
+      // Size not numeric — distribute across all sizes proportionally (fallback)
+      SIZES.forEach(s => sales[s] = (sales[s]||0) + qty/SIZES.length);
+    }
+  });
+  if (found) return sales;
+
+  // ── Path 2: Direct parentName key (if historical exported by name not SKU) ──
+  const directQty = hist[productName];
+  if (directQty) {
+    // No size breakdown available — use current size breakdown as proxy
+    const sbk = getSizeBreakdown(productName, APP.sheet.breakdownPeriod || 'L30');
+    SIZES.forEach(s => sales[s] = Math.round(directQty * (sbk[s]||0)));
+    return sales;
+  }
+
+  // ── Path 3: byParentName index built during data load ──
+  const byPN = APP.derived.historicalByParentName?.[key];
+  if (byPN?.[productName]) {
+    const qty = byPN[productName];
+    const sbk = getSizeBreakdown(productName, APP.sheet.breakdownPeriod || 'L30');
+    SIZES.forEach(s => sales[s] = Math.round(qty * (sbk[s]||0)));
+    return sales;
+  }
+
+  return sales;
+}
+
+// Get TOTAL historical sales for a product (no size breakdown) — faster for LY columns
+function buildHistoricalByParentName(historical, skuMap) {
+  // Creates { "2025-1": { "Product Name": totalQty } } from SKU-level historical
+  const byPN = {};
+  Object.entries(historical).forEach(([key, skuQtys]) => {
+    if (!byPN[key]) byPN[key] = {};
+    Object.entries(skuQtys).forEach(([sku, qty]) => {
+      // Try SKU map first
+      const info = skuMap?.[sku];
+      if (info?.parentName) {
+        byPN[key][info.parentName] = (byPN[key][info.parentName]||0) + qty;
+      } else {
+        // SKU not in map — store directly (might be a parent name key already)
+        byPN[key][sku] = (byPN[key][sku]||0) + qty;
+      }
+    });
+  });
+  return byPN;
+}
+
+function getHistoricalTotalForProduct(productName, year, month) {
+  const key  = `${year}-${month}`;
+  const hist = APP.derived.historical?.[key] || {};
+
+  // Path 1: sum via SKU map
+  let total = 0;
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName !== productName) return;
+    total += hist[sku] || 0;
+  });
+  if (total > 0) return total;
+
+  // Path 2: direct name key
+  if (hist[productName]) return hist[productName];
+
+  // Path 3: byParentName index
+  return APP.derived.historicalByParentName?.[key]?.[productName] || 0;
+}
+
+
+function getSizeBreakdown(productName, period, _sizes) {
+  const sz = _sizes || SIZES;
+  let salesBySz;
+  if (period === 'custom') {
+    // Use Historical MOM with month/year range
+    salesBySz = getHistoricalSizeBreakdown(productName, APP.sheet.bkFromDate, APP.sheet.bkToDate, sz);
+  } else {
+    salesBySz = getSalesForProduct(productName, period, sz);
+  }
+  const total = sz.reduce((s,s2) => s + (salesBySz[s2]||0), 0);
+  const pct = {};
+  sz.forEach(s2 => pct[s2] = total > 0 ? (salesBySz[s2]||0)/total : 1/sz.length);
+  return pct;
+}
+
+// Get size breakdown from historical MOM for a date range
+// Get beginning inventory from LAST INV tab for a product + month key "YYYY-M"
+function getLastInv(productName, yearMonthKey) {
+  return APP.derived.lastInv?.[productName]?.[yearMonthKey] || 0;
+}
+
+// Get last 3 months inventory keys relative to a date
+function getLast3InvKeys(orderDate) {
+  const keys = [];
+  for (let i=1;i<=3;i++){
+    const d=new Date(orderDate); d.setDate(1); d.setMonth(d.getMonth()-i);
+    keys.push(`${d.getFullYear()}-${d.getMonth()+1}`);
+  }
+  return keys;
+}
+
+// Get size breakdown from historical MOM for a MONTH/YEAR range
+// fromMonth/toMonth are "YYYY-MM" strings (from <input type="month">)
+function getHistoricalSizeBreakdown(productName, fromMonth, toMonth, _sizes) {
+  const sz = _sizes || SIZES;
+  const result = {}; sz.forEach(s=>result[s]=0);
+  if (!fromMonth || !toMonth) return result;
+
+  // Parse "YYYY-MM" or "YYYY-M" → { yr, mo }
+  const parseYM = s => {
+    const parts = String(s).split('-').map(Number);
+    return { yr: parts[0], mo: parts[1] };
+  };
+  const from = parseYM(fromMonth);
+  const to   = parseYM(toMonth);
+  if (!from.yr || !from.mo || !to.yr || !to.mo) return result;
+
+  const hist = APP.derived.historical || {};
+  Object.entries(hist).forEach(([key, skuQtys]) => {
+    // key is "YYYY-M" (e.g. "2025-3" not "2025-03")
+    const [yr, mo] = key.split('-').map(Number);
+    if (yr < from.yr || (yr === from.yr && mo < from.mo)) return;
+    if (yr > to.yr   || (yr === to.yr   && mo > to.mo))   return;
+
+    Object.entries(skuQtys).forEach(([sku, qty]) => {
+      const info = APP.derived.skuMap?.[sku];
+      if (!info || info.parentName !== productName) return;
+      const rawSize = String(info.size || '').trim();
+      const matched = sz.find(s => String(s).trim() === rawSize
+        || (parseFloat(s) === parseFloat(rawSize) && !isNaN(parseFloat(s))));
+      if (matched !== undefined) result[matched] = (result[matched]||0) + qty;
+    });
+  });
+  return result;
+}
+
+function getPeriodDays(period) {
+  return period === 'L30' ? 30 : period === 'L60' ? 60 : 90;
+}
+
+function getDaysInMonth(year, monthName) {
+  const m = MONTHS_SHORT[monthName];
+  return new Date(year, m+1, 0).getDate();
+}
+
+function estimateCurrentMonthSales(productName, period, currentDate) {
+  // (sales / days so far) * total days
+  const sales = getSalesForProduct(productName, period);
+  const salesTotal = SIZES.reduce((s,sz)=>s+(sales[sz]||0), 0);
+  const periodDays = getPeriodDays(period);
+  const today = new Date(currentDate || APP.sheet.orderDate);
+  const dayOfMonth = today.getDate();
+  const totalDays = getDaysInMonth(today.getFullYear(), MONTHS_FULL[today.getMonth()]);
+  const dailySales = salesTotal / periodDays;
+  return dailySales * totalDays;
+}
+
+function calcDOS(productName, period) {
+  const sales = getSalesForProduct(productName, period);
+  const total = SIZES.reduce((s,sz)=>s+(sales[sz]||0), 0);
+  const periodDays = getPeriodDays(period);
+  return total > 0 ? periodDays / (total / periodDays) : 0; // days to sell through current inv
+}
+
+function getPOForProduct(productName) {
+  const pos = [];
+  (APP.derived.poOnOrder || []).forEach(po => {
+    const info = APP.derived.skuMap?.[po.sku];
+    if (info?.parentName === productName) pos.push(po);
+  });
+  // Group by ref
+  const grouped = {};
+  pos.forEach(po => {
+    const key = po.ref || po.exf;
+    if (!grouped[key]) grouped[key] = { ref: po.ref, exf: po.exf, mode: po.mode, sizes: {}, total: 0 };
+    const size = parseInt(APP.derived.skuMap?.[po.sku]?.size);
+    if (SIZES.includes(size)) { grouped[key].sizes[size] = (grouped[key].sizes[size]||0) + po.qty; grouped[key].total += po.qty; }
+  });
+  return Object.values(grouped);
+}
+
+function calcLandingMonth(exf, mode) {
+  if (!exf) return null;
+
+  // Robust date parsing — handles "2026-04-26", "04/26/2026", "04/26/26"
+  let d;
+  const s = String(exf).trim();
+  const m = s.match(/^(\d{1,4})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (m) {
+    let [,a,b,c] = m;
+    if (a.length === 4) {
+      // YYYY-MM-DD
+      d = new Date(+a, +b-1, +c);
+    } else if (c.length === 2) {
+      // MM/DD/YY
+      d = new Date(2000 + +c, +a-1, +b);
+    } else {
+      // MM/DD/YYYY
+      d = new Date(+c, +a-1, +b);
+    }
+  } else {
+    d = new Date(exf);
+  }
+  if (!d || isNaN(d.getTime())) return null;
+
+  // Sea only if 'sea' explicitly in mode, otherwise Air
+  const isAir = !(mode||'').toLowerCase().includes('sea');
+  const addDays = isAir ? 15 : 45;
+
+  // Add lead days
+  d.setDate(d.getDate() + addDays);
+
+  // Day 1-10 → land that month; day 11+ → next month
+  if (d.getDate() > 10) d.setMonth(d.getMonth() + 1);
+  d.setDate(1);
+
+  return {
+    month: MONTHS_FULL[d.getMonth()],
+    year:  d.getFullYear(),
+    key:   `${d.getFullYear()}-${d.getMonth()+1}`,
+    mode:  isAir ? 'Air' : 'Sea'
+  };
+}
+
+// Get all POs grouped by reference across all selected products
+function getAllPOsForProducts(products) {
+  const grouped = {};
+  products.forEach(productName => {
+    (APP.derived.poOnOrder || []).forEach(po => {
+      const info = APP.derived.skuMap?.[po.sku];
+      if (info?.parentName !== productName) return;
+      const ref = po.ref || po.exf;
+      if (!grouped[ref]) grouped[ref] = { ref: po.ref, exf: po.exf, mode: po.mode, byProduct: {}, totalBySize: {}, total: 0 };
+      if (!grouped[ref].byProduct[productName]) grouped[ref].byProduct[productName] = { sizes: {}, total: 0 };
+      const size = parseInt(info.size);
+      if (SIZES.includes(size)) {
+        grouped[ref].byProduct[productName].sizes[size] = (grouped[ref].byProduct[productName].sizes[size]||0) + po.qty;
+        grouped[ref].byProduct[productName].total += po.qty;
+        grouped[ref].totalBySize[size] = (grouped[ref].totalBySize[size]||0) + po.qty;
+        grouped[ref].total += po.qty;
+      }
+    });
+  });
+  // Add landing month to each PO
+  Object.values(grouped).forEach(po => {
+    const ovKey = `po_${po.ref}`;
+    const ov = APP.overrides?.[ovKey];
+    if (ov?.exclude) { po.landing = null; po.excluded = true; return; }
+    if (ov?.landingMonth) {
+      const [y,m] = ov.landingMonth.split('-').map(Number);
+      po.landing = { month: MONTHS_FULL[m-1], year: y, key: ov.landingMonth, mode: po.mode, overridden: true };
+    } else {
+      po.landing = calcLandingMonth(po.exf, po.mode);
+    }
+  });
+  return grouped;
+}
+
+function calcProjectedSales(productName, month, period, orderDate, prevMonthSales) {
+  // Override check
+  const ov = APP.overrides?.[productName]?.[month];
+  if (ov?.sales !== undefined && ov.sales !== null) return ov.sales;
+
+  const today = new Date(orderDate || APP.sheet.orderDate);
+  const orderMonth = MONTHS_FULL[today.getMonth()];
+  const orderYear = today.getFullYear();
+  const monthIdx = MONTHS_SHORT[month];
+
+  if (month === orderMonth) {
+    // Current month: project from remaining selling days
+    return estimateCurrentMonthSales(productName, period, orderDate);
+  } else {
+    // Future: based on prev month + bump
+    const base = prevMonthSales !== undefined ? prevMonthSales : estimateCurrentMonthSales(productName, period, orderDate);
+    const bump = APP.overrides?.[productName]?.[month]?.bump || 0;
+    return base * (1 + bump/100);
+  }
+}
+
+function calcProjectedInventory(productName, month, prevInventory, projectedSales, poLanding) {
+  return Math.max(0, (prevInventory||0) - (projectedSales||0) + (poLanding||0));
+}
+
+function calcOrderLanding(productName, month, monthInv, monthSales) {
+  const dos = parseInt(APP.config.dos || 30);
+  const optimal = getOptimalForProduct(productName);
+  const dailySales = monthSales > 0 ? monthSales / 30 : 0;
+  const needed = dailySales * dos + optimal;
+  return Math.max(0, needed - monthInv);
+}
+
+function getOptimalForProduct(productName) {
+  let total = 0;
+  Object.entries(APP.derived.skuMap || {}).forEach(([sku, info]) => {
+    if (info.parentName === productName) total += APP.derived.optimalStock?.[sku] || 0;
+  });
+  return total;
+}
+
+function getL30ForProduct(productName) {
+  return getSalesForProduct(productName, 'L30');
+}
+
+function recalcAll() {
+  APP.config.dos = parseInt(APP.config.dos) || 30;
+  APP.config.stores = parseInt(APP.config.stores) || 43;
+  buildSheet();
+}
+
+// ══════════════════════════════════════════════════
+// BUILD SHEET
+// ══════════════════════════════════════════════════
+function rebuildKeepScroll() {
+  const s = document.getElementById('sheetScroll');
+  const st = s?.scrollTop||0, sl = s?.scrollLeft||0;
+  buildSheet();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const s2 = document.getElementById('sheetScroll');
+    if(s2){s2.scrollTop=st;s2.scrollLeft=sl;}
+  }));
+}
+
+function buildSheet() {
+  const container = document.getElementById('sheetContent');
+  if (!container) return;
+
+  const products = APP.sheet.selectedProducts || [];
+  if (!products.length) {
+    container.innerHTML = '<div style="padding:40px;color:var(--text3);text-align:center">Select a Product Type and Products to build the sheet.</div>';
+    return;
+  }
+
+  const period    = document.getElementById('selSalesPeriod')?.value || 'L30';
+  const odStr     = document.getElementById('selOrderDate')?.value || APP.sheet.orderDate || new Date().toISOString().slice(0,10);
+  const orderDate = new Date(odStr + 'T12:00:00');
+  const orderDay  = orderDate.getDate();
+  const category  = SS.type.value || APP.sheet.category || '';
+  // Sizes: use whatever user picked; auto-detect from skuMap if nothing selected
+  const _availSizes = getAvailableSizes(products);
+  const SIZES = (APP.sheet.selectedSizes?.length) ? APP.sheet.selectedSizes : _availSizes;
+  const periodDays= getPeriodDays(period);
+  const bkPeriod  = APP.sheet.breakdownPeriod || period;
+
+  // Build 12 rolling months from order month
+  const rollingMonths = [];
+  for (let i=0;i<12;i++){
+    const d=new Date(orderDate); d.setDate(1); d.setMonth(d.getMonth()+i);
+    const days = new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    rollingMonths.push({ name:MONTHS_FULL[d.getMonth()], year:d.getFullYear(), idx:d.getMonth(), days });
+  }
+
+  // Pre-compute per-product data
+  const pd = {};
+  products.forEach(p => {
+    const inv   = getInventoryForProduct(p);
+    const sales = getSalesForProduct(p, period);
+    const l90   = getSalesForProduct(p,'L90');
+    const invTot= SIZES.reduce((a,s)=>a+(inv.onHand[s]||0)+(inv.inTransit[s]||0),0);
+    const salTot= SIZES.reduce((a,s)=>a+(sales[s]||0),0);
+    const l90T  = SIZES.reduce((a,s)=>a+(l90[s]||0),0);
+    const daily = salTot/periodDays;
+    const daysInMo = rollingMonths[0].days;
+    const remaining= daysInMo - orderDay + 1;
+    const dos   = daily>0 ? Math.round(invTot/daily) : 0;
+    const estMo = Math.round(daily*remaining);
+    const sbk   = getSizeBreakdown(p, bkPeriod);
+    pd[p] = {inv,sales,l90,invTot,salTot,l90T,daily,dos,estMo,sbk};
+  });
+
+  // ── Color palette per month section ──
+  const monthColors = ['#dbeafe','#dcfce7','#ede9fe','#fef9c3','#cffafe','#fce7f3','#e0f2fe','#fefce8','#f3e8ff','#d1fae5','#fef3c7','#ecfdf5'];
+
+  // ── Build HTML ──
+  let h = `<div id="sheetScroll" style="overflow:auto;max-height:calc(100vh - 120px);min-width:100%">
+    <table class="ordering-table" style="border-collapse:collapse;min-width:max-content">`;
+
+  // ── HEADER ──
+  h += row_span(`<b>${category}</b>`, 20, 'background:var(--bg4);color:var(--accent);font-size:13px;font-weight:700;padding:7px 12px');
+  h += row_span(odStr.split('-').reverse().join('.').slice(0,-5), 20, 'background:var(--bg4);color:var(--text3);font-size:11px;padding:2px 12px');
+
+  // Old CI section removed — new Section B handles this inline with PO blocks
+
+  // ── SECTION 2: SIZE BREAKDOWN ──
+  const sb_bg = 'background:#f1f5f9';
+  // Aggregate size totals across all selected products for breakdown
+  const bkSales={};SIZES.forEach(s=>bkSales[s]=0);
+  products.forEach(p=>{
+    let sal;
+    if (bkPeriod === 'custom') {
+      sal = getHistoricalSizeBreakdown(p, APP.sheet.bkFromDate, APP.sheet.bkToDate, SIZES);
+    } else {
+      sal = getSalesForProduct(p, bkPeriod, SIZES);
+    }
+    SIZES.forEach(s=>bkSales[s]+=(sal[s]||0));
+  });
+  const bkTotal=SIZES.reduce((a,s)=>a+(bkSales[s]||0),0);
+
+  h += `<tr>
+    <th style="${sb_bg};text-align:left;padding:4px 8px">
+      <span style="font-size:11px;color:var(--accent);font-weight:600">Breakdown:</span>
+      <select id="bkPeriodSel" onchange="onBkPeriodChange(this.value)" 
+        style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:2px 5px;font-size:11px;margin-left:4px">
+        <option value="L30"${bkPeriod==='L30'?' selected':''}>L30</option>
+        <option value="L60"${bkPeriod==='L60'?' selected':''}>L60</option>
+        <option value="L90"${bkPeriod==='L90'?' selected':''}>L90</option>
+        <option value="custom"${bkPeriod==='custom'?' selected':''}>Custom</option>
+      </select>
+      <span id="bkDateRange" style="display:${bkPeriod==='custom'?'inline-flex':'none'};align-items:center;gap:4px;margin-left:6px">
+        <label style="font-size:10px;color:var(--text2)">From</label>
+        <input type="month" id="bkFromDate" value="${APP.sheet.bkFromDate||''}" onchange="APP.sheet.bkFromDate=this.value;buildSheet()"
+          style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:2px 5px;font-size:11px"/>
+        <label style="font-size:10px;color:var(--text2)">To</label>
+        <input type="month" id="bkToDate" value="${APP.sheet.bkToDate||''}" onchange="APP.sheet.bkToDate=this.value;buildSheet()"
+          style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:2px 5px;font-size:11px"/>
+      </span>
+    </th>
+    ${SIZES.map(s=>`<th style="${sb_bg};color:var(--text2)">${s}</th>`).join('')}
+    <th style="${sb_bg}" colspan="5"></th>
+  </tr>
+  <tr>
+    <td class="col-product" style="${sb_bg}">Total Sales</td>
+    ${SIZES.map(s=>`<td class="num" style="${sb_bg}">${(bkSales[s]||0).toLocaleString()}</td>`).join('')}
+    <td colspan="5" style="${sb_bg}"></td>
+  </tr>
+  <tr>
+    <td class="col-product" style="${sb_bg}">Average %</td>
+    ${SIZES.map(s=>{const pct=bkTotal>0?((bkSales[s]||0)/bkTotal*100).toFixed(1):0;return `<td class="pct" style="${sb_bg}">${pct}%</td>`;}).join('')}
+    <td colspan="5" style="${sb_bg}"></td>
+  </tr>
+  <tr>
+    <td class="col-product" style="${sb_bg};color:var(--yellow)">Override Size %</td>
+    ${SIZES.map(s=>{
+      const ov=APP.overrides?.sizeBreakdown?.[s];
+      return `<td class="editable pct" style="${sb_bg}" contenteditable="true"
+        data-type="sizeBreakdown" data-size="${s}"
+        onblur="onSizeBkOverride(this)">${ov!==undefined?ov+'%':''}</td>`;
+    }).join('')}
+    <td colspan="5" style="${sb_bg}"></td>
+  </tr>`;
+
+  h += row_span('', 25, 'height:12px');
+
+  // ══════════════════════════════════════════════════════════
+  // PRE-COMPUTE: POs, rolling inventory, projections
+  // ══════════════════════════════════════════════════════════
+  const allPOs = getAllPOsForProducts(products);
+  const poList = Object.values(allPOs).filter(po => po.total > 0);
+
+  // Rolling inventory per product per size
+  const rollingInv = {};
+  products.forEach(p => {
+    const inv = getInventoryForProduct(p);
+    rollingInv[p] = {};
+    SIZES.forEach(s => rollingInv[p][s] = (inv.onHand[s]||0) + (inv.inTransit[s]||0));
+  });
+
+  // Base monthly projection per product
+  let prevProjByProduct = {};
+  products.forEach(p => {
+    const sales = getSalesForProduct(p, period);
+    const salTot = SIZES.reduce((a,s)=>a+(sales[s]||0),0);
+    prevProjByProduct[p] = Math.round(salTot / periodDays * 30);
+  });
+
+  // Column layout constants
+  const N_PO = poList.length;
+  const CI_METRIC_COLS = 8; // L30, DOS, Est, L90, hist×4
+  const PO_DATA_COLS   = 1 + SIZES.length + 1; // Product name + N sizes + total (dynamic)
+  const CI_LEFT_COLS   = 1 + SIZES.length + 1 + CI_METRIC_COLS; // name+sizes+total+metrics
+  const TOTAL_COLS     = CI_LEFT_COLS + N_PO * PO_DATA_COLS + 20;
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION A: PO REF HEADERS + Override/Default Month
+  // Positioned above the reference month columns (top of CI)
+  // ══════════════════════════════════════════════════════════
+  if (N_PO > 0) {
+    const ciLeftSpan = 1 + SIZES.length + 1 + CI_METRIC_COLS; // name+sizes+total+metrics
+
+    // Row 1: PO Ref + EXF — right-indented (blank on left, starts at PO columns)
+    let poRefRow = `<tr><td colspan="${ciLeftSpan}" style="background:var(--bg3)"></td>`;
+    poList.forEach(po => {
+      const modeTag   = (po.landing?.mode||'').toLowerCase().includes('sea') ? '🚢 Sea' : '✈ Air';
+      const isExcluded = APP.overrides?.[`po_${po.ref}`]?.exclude;
+      poRefRow += `<th colspan="${PO_DATA_COLS}" style="background:#dbeafe;color:var(--accent);font-size:11px;font-weight:700;text-align:center;padding:4px 6px;border-left:2px solid var(--border2);${isExcluded?'opacity:0.4;text-decoration:line-through':''}">${modeTag} — ${po.ref} — EXF ${po.exf||'?'}</th>`;
+    });
+    poRefRow += `</tr>`;
+    h += poRefRow;
+
+    // Row 2: Override Month — label inside first PO col, rest are dropdowns
+    let ovRow = `<tr><td colspan="${ciLeftSpan}" style="background:var(--bg3)"></td>`;
+    poList.forEach((po, pi) => {
+      const ovKey   = `po_${po.ref}`;
+      const ovMonth = APP.overrides?.[ovKey]?.landingMonth || '';
+      const isExcl  = APP.overrides?.[ovKey]?.exclude;
+      ovRow += `<td colspan="${PO_DATA_COLS}" style="background:#eff6ff;padding:3px 6px;border-left:2px solid var(--border2)">
+        <div style="display:flex;gap:4px;align-items:center">
+          ${pi===0?'<span style="font-size:10px;color:var(--text2);font-weight:600;white-space:nowrap;margin-right:4px">Override:</span>':''}
+          <select class="po-landing-sel" data-ref="${po.ref.replace(/"/g,'&quot;')}"
+            style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:2px 5px;font-size:11px;flex:1">
+            <option value="">— Default —</option>
+            ${rollingMonths.map(m=>`<option value="${m.year}-${m.idx+1}"${ovMonth===`${m.year}-${m.idx+1}`?' selected':''}>${m.name} ${m.year}</option>`).join('')}
+          </select>
+          <label title="Exclude this PO" style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--red);cursor:pointer;white-space:nowrap">
+            <input type="checkbox" class="po-excl-chk" data-ref="${po.ref.replace(/"/g,'&quot;')}"${isExcl?' checked':''} style="accent-color:var(--red);cursor:pointer"/> Excl
+          </label>
+        </div>
+      </td>`;
+    });
+    ovRow += `</tr>`;
+    h += ovRow;
+
+    // Row 3: Default Month — label inside first PO col, rest are calculated landing
+    let dfRow = `<tr><td colspan="${ciLeftSpan}" style="background:var(--bg3)"></td>`;
+    poList.forEach((po, pi) => {
+      const land    = po.landing;
+      const ovKey   = `po_${po.ref}`;
+      const ovMonth = APP.overrides?.[ovKey]?.landingMonth;
+      const isExcl  = APP.overrides?.[ovKey]?.exclude;
+      const landLabel = isExcl ? '⛔ Excl' : (ovMonth
+        ? `📌 ${MONTHS_FULL[parseInt(ovMonth.split('-')[1])-1].slice(0,3)} ${String(ovMonth.split('-')[0]).slice(2)}`
+        : (land ? `${land.month.slice(0,3)} ${String(land.year).slice(2)}` : '—'));
+      dfRow += `<td colspan="${PO_DATA_COLS}" style="background:#eff6ff;border-left:2px solid var(--border2);padding:3px 8px">
+        <div style="display:flex;align-items:center;gap:6px">
+          ${pi===0?'<span style="font-size:10px;color:var(--text2);font-weight:600;white-space:nowrap">Default:</span>':''}
+          <span style="font-size:12px;font-weight:700;color:${isExcl?'var(--red)':ovMonth?'var(--accent)':'var(--green)'}">${landLabel}</span>
+        </div>
+      </td>`;
+    });
+    dfRow += `</tr>`;
+    h += dfRow;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION B: CURRENT INVENTORY (with PO blocks inline)
+  // ══════════════════════════════════════════════════════════
+  const ci_bg = 'background:#f0fdf4';
+  // Compute reference months for historical columns
+  // Reference = last 3 completed months + LY equivalent of previous month
+  const prevMo  = orderDate.getMonth()===0 ? 12 : orderDate.getMonth();       // e.g. Mar (month 3)
+  const prevYr  = orderDate.getMonth()===0 ? orderDate.getFullYear()-1 : orderDate.getFullYear();
+  const prev2Mo = orderDate.getMonth()<=1 ? orderDate.getMonth()+11 : orderDate.getMonth()-1;
+  const prev2Yr = orderDate.getMonth()<=1 ? orderDate.getFullYear()-1 : orderDate.getFullYear();
+  const prev3Mo = orderDate.getMonth()<=2 ? orderDate.getMonth()+10 : orderDate.getMonth()-2;
+  const prev3Yr = orderDate.getMonth()<=2 ? orderDate.getFullYear()-1 : orderDate.getFullYear();
+  const refMonths = [
+    { yr: prevYr-1,  mo: prevMo  },   // LY prev month (e.g. Mar 2025)
+    { yr: prevYr,    mo: prevMo  },   // prev month    (e.g. Mar 2026)
+    { yr: prev2Yr,   mo: prev2Mo },   // 2 months ago  (e.g. Feb 2026)
+    { yr: prev3Yr,   mo: prev3Mo },   // 3 months ago  (e.g. Jan 2026)
+  ];
+  const refLabels = refMonths.map(r=>`${MONTHS_FULL[r.mo-1].slice(0,3)}. ${r.yr}`);
+
+  // CI Header row
+  h += `<tr>
+    <th style="${ci_bg};text-align:left;position:sticky;left:0">Current Inventory – ${odStr}</th>
+    ${SIZES.map(s=>`<th style="${ci_bg}">${s}</th>`).join('')}
+    <th style="${ci_bg}">Grand Total</th>
+    <th style="${ci_bg}">${period} Sales</th>
+    <th style="${ci_bg}">DOS</th>
+    <th style="${ci_bg}">Est. ${rollingMonths[0].name} Sales</th>
+    <th style="${ci_bg}">L90 Days</th>
+    ${refLabels.map(l=>`<th style="${ci_bg};color:var(--yellow)">${l}</th>`).join('')}
+    ${poList.map(po=>`<th style="background:#eef2ff;color:var(--accent);min-width:140px;text-align:left">Product</th>${SIZES.map(s=>`<th style="background:#eef2ff;color:var(--text2)">${s}</th>`).join('')}<th style="background:#eef2ff;color:var(--text2)">Total</th>`).join('')}
+  </tr>`;
+
+  // (sub-header removed)
+
+  // CI Product rows (inventory + PO blocks inline)
+  let ciGrand={};SIZES.forEach(s=>ciGrand[s]=0);
+  let ciTotG=0,ciSalG=0,ciL90G=0,ciEstG=0;
+
+  products.forEach(p => {
+    const {inv,salTot,l90T,invTot,dos,estMo}=pd[p];
+    SIZES.forEach(s=>{ const v=(inv.onHand[s]||0)+(inv.inTransit[s]||0); ciGrand[s]+=v; });
+    ciTotG+=invTot; ciSalG+=salTot; ciL90G+=l90T; ciEstG+=estMo;
+    const refVals = refMonths.map(r=>getHistoricalTotalForProduct(p,r.yr,r.mo));
+
+    h += `<tr class="row-product">
+      <td class="col-product" title="${p}">${trunc(p)}</td>
+      ${SIZES.map(s=>{const v=(inv.onHand[s]||0)+(inv.inTransit[s]||0);return `<td class="num${v===0?' num-zero':''}">${v||'-'}</td>`;}).join('')}
+      <td class="num">${invTot.toLocaleString()}</td>
+      <td class="num">${salTot.toLocaleString()}</td>
+      <td class="num">${dos||'-'}</td>
+      <td class="num">${estMo.toLocaleString()}</td>
+      <td class="num">${l90T.toLocaleString()}</td>
+      ${refVals.map(v=>`<td class="num" style="color:var(--yellow)">${v||'-'}</td>`).join('')}
+      ${poList.map(po=>{
+        const pp=po.byProduct[p];
+        // Always show product name for alignment — show sizes if this product is in this PO
+        const ppSizes = pp ? SIZES.map(s=>`<td class="num${!(pp.sizes[s])?' num-zero':''}" style="background:#f8fafc">${pp.sizes[s]||'-'}</td>`).join('') 
+                           : SIZES.map(()=>`<td class="num-zero" style="background:#f8fafc">-</td>`).join('');
+        const ppTotal = pp ? `<td class="num" style="background:#f8fafc;font-weight:600">${pp.total||'-'}</td>` 
+                           : `<td class="num-zero" style="background:#f8fafc">-</td>`;
+        return `<td style="background:#f8fafc;font-size:11px;color:var(--yellow);min-width:140px" title="${p}">${trunc(p,20)}</td>${ppSizes}${ppTotal}`;
+      }).join('')}
+    </tr>`;
+  });
+
+  // CI Grand Total
+  h += `<tr class="row-grand-total">
+    <td class="col-product"><b>Grand Total</b></td>
+    ${SIZES.map(s=>`<td class="num"><b>${(ciGrand[s]||0)||'-'}</b></td>`).join('')}
+    <td class="num"><b>${ciTotG.toLocaleString()}</b></td>
+    <td class="num"><b>${ciSalG.toLocaleString()}</b></td>
+    <td></td>
+    <td class="num"><b>${ciEstG.toLocaleString()}</b></td>
+    <td class="num"><b>${ciL90G.toLocaleString()}</b></td>
+    ${refMonths.map(()=>'<td></td>').join('')}
+    ${poList.map(po=>`<td style="background:#f0f9ff;font-weight:700;color:var(--accent);min-width:140px">Grand Total</td>${SIZES.map(s=>`<td class="num" style="background:#f0f9ff"><b>${(po.totalBySize[s]||0)||'-'}</b></td>`).join('')}<td class="num" style="background:#f0f9ff"><b>${po.total}</b></td>`).join('')}
+  </tr>`;
+
+  h += row_span('', TOTAL_COLS, 'height:14px');
+
+  // ══════════════════════════════════════════════════════════
+  // SECTION C: 12 MONTH ROLLING — INLINE (Sales | Inventory | Incoming)
+  // ══════════════════════════════════════════════════════════
+  // Column plan per month (after sticky product name):
+  // SALES: 7 sizes | ActProj | ProjTotal | Override | Bump% | LY | YOY | LY MOM | L30 | LY Inv = 16 cols
+  // INV:   7 sizes | Total | DOS | PO = 10 cols
+  // INC:   7 sizes | Total = 8 cols
+  // Total: 34 cols per month band
+
+  rollingMonths.forEach((mo, mi) => {
+    const mbg  = `background:${monthColors[mi%12]}`;
+    const ibg  = `background:${monthColors[(mi+3)%12]};opacity:0.85`;
+    const incbg= `background:${monthColors[(mi+6)%12]};opacity:0.80`;
+    const moKey= `${mo.year}-${mo.idx+1}`;
+
+    // Incoming POs this month
+    const incoming={};
+    products.forEach(p=>{incoming[p]={};SIZES.forEach(s=>incoming[p][s]=0);});
+    poList.forEach(po=>{
+      if(po.excluded||!po.landing||po.landing.key!==moKey)return;
+      products.forEach(p=>{
+        const pp=po.byProduct[p];if(!pp)return;
+        SIZES.forEach(s=>incoming[p][s]=(incoming[p][s]||0)+(pp.sizes[s]||0));
+      });
+    });
+
+    // Start-of-month inventory = rolling + incoming
+    const startInv={};
+    products.forEach(p=>{
+      startInv[p]={};
+      SIZES.forEach(s=>startInv[p][s]=(rollingInv[p][s]||0)+(incoming[p][s]||0));
+    });
+
+    const hasIncoming = true; // always show incoming section
+
+    // ── MONTH HEADER ROW ──
+    h += `<tr>
+      <th style="${mbg};text-align:left;color:#92400e;font-size:12px">${mo.name} ${mo.year} — Sales</th>
+      ${SIZES.map(s=>`<th style="${mbg}">${s}</th>`).join('')}
+      <th style="${mbg};color:var(--green)">Actual Proj</th>
+      <th style="${mbg}">Proj Total</th>
+      <th style="${mbg};color:var(--yellow)">Override</th>
+      <th style="${mbg};color:var(--accent)">Bump%</th>
+      <th style="${mbg};color:var(--text3)">LY ${mo.name}</th>
+      <th style="${mbg};color:var(--green)">YOY%</th>
+      <th style="${mbg};color:var(--purple)">LY MOM</th>
+      <th style="${mbg};color:var(--accent)">${period}</th>
+      <th style="${mbg};color:var(--yellow)">LY Inv</th>
+      <th style="${ibg};border-left:2px solid var(--border2);color:#16a34a;min-width:200px">${mo.name} — Inventory</th>
+      ${SIZES.map(s=>`<th style="${ibg}">${s}</th>`).join('')}
+      <th style="${ibg}">Total</th>
+      <th style="${ibg};color:var(--yellow)">DOS</th>
+
+      ${hasIncoming?`
+        <th style="${incbg};border-left:2px solid var(--border2);color:var(--accent)">PO</th>
+        <th style="${incbg};color:var(--accent)">QTY</th>
+        <th style="${incbg};color:var(--green);min-width:200px">${mo.name} — Incoming</th>
+        ${SIZES.map(s=>`<th style="${incbg}">${s}</th>`).join('')}
+        <th style="${incbg}">Total</th>
+      `:''}
+    </tr>`;
+
+    // Per-product rows
+    let msG={};SIZES.forEach(s=>msG[s]=0);
+    let miG={};SIZES.forEach(s=>miG[s]=0);
+    let mcG={};SIZES.forEach(s=>mcG[s]=0);
+    let actG=0,projG=0,invTotG=0,incTotG=0,styleCount=0;
+    const formulaSalesByProduct={};
+
+    // PO summary for Incoming section (unique refs landing this month)
+    const landingPOs = poList.filter(po=>!po.excluded&&po.landing?.key===moKey);
+    const landingPOSummary = landingPOs.map(po=>({
+      ref: po.ref, exf: po.exf,
+      // QTY = sum across selected products only (not all products in PO)
+      qty: products.reduce((a,p)=>a+(po.byProduct[p]?.total||0), 0)
+    }));
+
+    products.forEach(p=>{
+      const sbk=getEffectiveSizeBreakdown(p,bkPeriod);
+      const ovSales=APP.overrides?.[p]?.[mo.name]?.sales;
+      const bump=APP.overrides?.[p]?.[mo.name]?.bump??null;
+
+      // Projection
+      const sal=getSalesForProduct(p,period);
+      const salTot=SIZES.reduce((a,s)=>a+(sal[s]||0),0);
+      const daily=salTot/periodDays;
+      const baseProj=mi===0?Math.round(daily*(mo.days-orderDay+1)):Math.round(daily*30);
+      const prevBase=prevProjByProduct[p]||baseProj;
+      const projSales=bump!==null?Math.round(prevBase*(1+bump/100)):baseProj;
+      const formulaSales=ovSales!==undefined?ovSales:projSales;
+
+      // Actual proj (constrained by inventory)
+      const bySzA={};
+      SIZES.forEach(s=>{bySzA[s]=Math.min(Math.round(formulaSales*(sbk[s]||0)),startInv[p][s]||0);msG[s]+=bySzA[s];});
+      const actualProj=SIZES.reduce((a,s)=>a+bySzA[s],0);
+      const limited=actualProj<formulaSales;
+      actG+=actualProj;projG+=formulaSales;if(formulaSales>0)styleCount++;
+      // Chain base = full-month L30 rate (not partial current-month projection)
+      // so May's bump doesn't inherit April's shorter-day estimate
+      prevProjByProduct[p] = mi===0 ? Math.round(daily*30) : formulaSales;
+      formulaSalesByProduct[p]=formulaSales;
+
+      // Inventory (start of month)
+      const inv=startInv[p];
+      const invTot=SIZES.reduce((a,s)=>a+(inv[s]||0),0);
+      SIZES.forEach(s=>miG[s]+=(inv[s]||0));invTotG+=invTot;
+
+      // DOS
+      // DOS = days inventory lasts based on rolling projected sales forward
+      const dosVal = (()=>{
+        if (!invTot || invTot <= 0) return '—';
+        let rem = invTot, days = 0;
+        let prevBase2 = Math.round((salTot/periodDays)*30);
+        for (let di=mi; di<rollingMonths.length && rem>0; di++) {
+          const dmo = rollingMonths[di];
+          const dbump = APP.overrides?.[p]?.[dmo.name]?.bump??null;
+          const dovSales = APP.overrides?.[p]?.[dmo.name]?.sales;
+          let dProj = di===0 ? Math.round(daily*(dmo.days-orderDay+1)) : Math.round(daily*30);
+          if (dbump!==null) dProj = Math.round(prevBase2*(1+dbump/100));
+          if (dovSales!==undefined) dProj = dovSales;
+          prevBase2 = dProj;
+          const dRate = dProj / dmo.days;
+          if (dRate<=0) { days+=dmo.days; rem=0; break; }
+          const dNeed = rem/dRate;
+          if (dNeed <= dmo.days) { days+=dNeed; rem=0; }
+          else { days+=dmo.days; rem-=dRate*dmo.days; }
+        }
+        return (rem>0?Math.round(days)+'+':Math.round(days));
+      })();
+
+      // PO ref
+
+
+      // Incoming
+      const inc=incoming[p];
+      const incTot=SIZES.reduce((a,s)=>a+(inc[s]||0),0);
+      SIZES.forEach(s=>mcG[s]+=(inc[s]||0));incTotG+=incTot;
+
+      // LY data
+      const lyTot=getHistoricalTotalForProduct(p,mo.year-1,mo.idx+1);
+      const lyPrev=getHistoricalTotalForProduct(p,mo.idx===0?mo.year-2:mo.year-1,mo.idx===0?12:mo.idx);
+      // YOY for current month: use L30 full-month rate (not partial-day projection)
+      const yoyBase = mi===0 ? Math.round(daily*30) : actualProj;
+      const yoy=lyTot>0?((yoyBase-lyTot)/lyTot*100).toFixed(1)+'%':'-';
+      const lymom=lyPrev>0?((lyTot-lyPrev)/lyPrev*100).toFixed(1)+'%':'-';
+      const lyInv=getLastInv(p,`${mo.year-1}-${mo.idx+1}`);
+
+      h+=`<tr class="row-product">
+        <td class="col-product" title="${p}">${trunc(p)}</td>
+        ${SIZES.map(s=>`<td class="num${bySzA[s]===0?' num-zero':''}">${bySzA[s]||'-'}</td>`).join('')}
+        <td class="num" style="color:${limited?'var(--yellow)':'var(--green)'}">${actualProj.toLocaleString()}${limited?'*':''}</td>
+        <td class="num" style="color:var(--text3)">${formulaSales.toLocaleString()}</td>
+        <td class="editable${ovSales!==undefined?' override':''}" contenteditable="true" data-product="${p}" data-month="${mo.name}" data-type="sales" onblur="onCellEdit(event)" onkeydown="onCellKey(event)">${ovSales!==undefined?ovSales:''}</td>
+        <td class="editable${bump!==null?' override':''}" contenteditable="true" data-product="${p}" data-month="${mo.name}" data-type="bump" onblur="onCellEdit(event)" onkeydown="onCellKey(event)" style="color:${bump>0?'var(--green)':bump<0?'var(--red)':'inherit'}">${bump!==null?(bump>0?'+':'')+bump+'%':''}</td>
+        <td class="num" style="color:var(--text3)">${lyTot||'-'}</td>
+        <td class="pct" style="color:${typeof yoy==='string'&&yoy.startsWith('-')?'var(--red)':'var(--green)'}">${yoy}</td>
+        <td class="pct" style="color:${typeof lymom==='string'&&lymom.startsWith('-')?'var(--red)':'var(--green)'}">${lymom}</td>
+        <td class="num" style="color:var(--accent)">${salTot||'-'}</td>
+        <td class="num" style="color:var(--yellow)">${lyInv||'-'}</td>
+        <td style="border-left:2px solid var(--border2);color:#16a34a;font-size:11px;min-width:200px;font-weight:500" title="${p}">${trunc(p,30)}</td>
+        ${SIZES.map(s=>`<td class="num${!(inv[s])?' num-zero':''}" style="color:#16a34a">${inv[s]||'-'}</td>`).join('')}
+        <td class="num" style="color:#16a34a;font-weight:600">${invTot.toLocaleString()}</td>
+        <td class="num" style="color:var(--yellow)">${dosVal}</td>
+
+        ${(()=>{
+          // Always show incoming section — show zeros if no PO lands
+          const rowIdx = products.indexOf(p);
+          const poPair = landingPOSummary[rowIdx];
+          const poCell  = poPair ? `<td style="border-left:2px solid var(--border2);font-size:10px;color:var(--accent);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${poPair.ref} — EXF ${poPair.exf}">${trunc(poPair.ref,16)}</td><td class="num" style="color:var(--accent);font-weight:600">${poPair.qty.toLocaleString()}</td>`
+                        : `<td style="border-left:2px solid var(--border2);color:var(--text3)">—</td><td></td>`;
+          return poCell
+            + `<td style="color:var(--green);font-size:11px;min-width:200px;font-weight:500" title="${p}">${trunc(p,30)}</td>`
+            + SIZES.map(s=>`<td class="num${!(inc[s])?' num-zero':''}" style="color:var(--green)">${inc[s]||'-'}</td>`).join('')
+            + `<td class="num" style="color:var(--green);font-weight:600">${incTot||'-'}</td>`;
+        })()}
+      </tr>`;
+
+      // End-of-month inventory for carry-forward
+      rollingInv[p]={};
+      SIZES.forEach(s=>rollingInv[p][s]=Math.max(0,(inv[s]||0)-bySzA[s]));
+    });
+
+    // Grand total row
+    h+=`<tr class="row-grand-total">
+      <td class="col-product"><b>Grand Total</b></td>
+      ${SIZES.map(s=>`<td class="num"><b>${(msG[s]||0)||'-'}</b></td>`).join('')}
+      <td class="num"><b>${actG.toLocaleString()}</b></td>
+      <td class="num" style="color:var(--text3)">${projG.toLocaleString()}</td>
+      <td></td>
+      <td style="color:var(--text3);font-size:11px">#Styles: ${styleCount}</td>
+      <td></td><td></td><td></td><td></td><td></td>
+      <td style="border-left:2px solid var(--border2);color:#16a34a;font-weight:600;min-width:200px">Grand Total</td>
+      ${SIZES.map(s=>`<td class="num" style="color:#16a34a"><b>${(miG[s]||0)||'-'}</b></td>`).join('')}
+      <td class="num" style="color:#16a34a"><b>${invTotG.toLocaleString()}</b></td>
+      <td></td>
+      ${hasIncoming?`
+        <td style="border-left:2px solid var(--border2);font-size:11px;color:var(--accent);white-space:nowrap">${landingPOSummary.length} PO(s)</td>
+        <td class="num" style="color:var(--accent);font-weight:600"><b>${landingPOSummary.reduce((a,p)=>a+p.qty,0).toLocaleString()}</b></td>
+        <td style="color:var(--green);font-weight:700;min-width:200px">Grand Total</td>
+        ${SIZES.map(s=>`<td class="num" style="color:var(--green)"><b>${(mcG[s]||0)||'-'}</b></td>`).join('')}
+        <td class="num" style="color:var(--green);font-weight:700"><b>${incTotG||'-'}</b></td>
+      `:''}
+    </tr>`;
+
+    h+=row_span('',TOTAL_COLS,'height:14px');
+  });
+
+    h += '</table></div>';
+  container.innerHTML = h;
+
+  updateSummary(products, rollingMonths.map(m=>m.name), {});
+}
+
+// helpers for buildSheet
+function row_span(content, cols, style) {
+  return `<tr><td colspan="${cols}" style="${style||''}">${content}</td></tr>`;
+}
+function trunc(s,n=38){ return s.length>n?s.slice(0,n)+'…':s; }
+
+function onBkPeriodChange(val) {
+  APP.sheet.breakdownPeriod = val;
+  buildSheet();
+}
+
+function getEffectiveSizeBreakdown(product, period) {
+  const base = getSizeBreakdown(product, period);
+  const ov   = APP.overrides?.sizeBreakdown || {};
+  const hasOv = Object.keys(ov).some(k => ov[k] !== undefined && ov[k] !== '');
+  if (!hasOv) return base;
+  // Use override % if set (normalize to sum=1)
+  // SIZES comes from global or caller
+  const result={};
+  let total=0;
+  SIZES.forEach(s=>{ result[s] = ov[s]!==undefined?parseFloat(ov[s])/100:(base[s]||0); total+=result[s]; });
+  if(total>0) SIZES.forEach(s=>result[s]/=total);
+  return result;
+}
+
+// ── SIZE FILTER ──
+function toggleSizePanel() {
+  const p = document.getElementById('sizePanel');
+  if (p.style.display === 'none') {
+    renderSizeCheckboxes();
+    // Position below the Sizes button
+    const btn = document.getElementById('sizePanelBtn');
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      p.style.left   = rect.left + 'px';
+      p.style.top    = (rect.bottom + 6) + 'px';
+      p.style.transform = 'none';
+    }
+    p.style.display = 'block';
+  } else {
+    p.style.display = 'none';
+  }
+}
+
+// (size panel click-outside handler registered in DOMContentLoaded)
+
+function renderSizeCheckboxes() {
+  // Available = all sizes in this category (from all products, not just selected)
+  const allCatProducts = APP.derived.productsByCategory?.[APP.sheet.category] || [];
+  const available = getAvailableSizes(allCatProducts.length ? allCatProducts : (APP.sheet.selectedProducts || []));
+  // Selected = user's current filter, defaulting to all available
+  const selected = APP.sheet.selectedSizes || available;
+  const box = document.getElementById('sizeCheckboxes');
+  box.innerHTML = available.map(s => `
+    <label style="display:flex;align-items:center;gap:4px;background:var(--bg3);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;font-family:monospace">
+      <input type="checkbox" value="${s}" ${selected.map(String).includes(String(s))?'checked':''} style="accent-color:var(--accent)"/>
+      ${s}
+    </label>`).join('');
+}
+
+function selectAllSizes() {
+  document.querySelectorAll('#sizeCheckboxes input').forEach(cb=>cb.checked=true);
+}
+function clearAllSizes() {
+  document.querySelectorAll('#sizeCheckboxes input').forEach(cb=>cb.checked=false);
+}
+function applySizes() {
+  const available = getAvailableSizes(APP.sheet.selectedProducts);
+  const checked   = [...document.querySelectorAll('#sizeCheckboxes input:checked')].map(cb=>cb.value);
+  const allNum    = available.every(s=>!isNaN(parseFloat(s)));
+  APP.sheet.selectedSizes = allNum ? checked.map(Number) : checked;
+  document.getElementById('sizePanel').style.display = 'none';
+  const lbl = document.getElementById('sizeFilterLabel');
+  if (lbl) lbl.textContent = (APP.sheet.selectedSizes && APP.sheet.selectedSizes.length < available.length)
+    ? `${APP.sheet.selectedSizes.join(', ')} ▾`
+    : 'All Sizes ▾';
+  buildSheet();
+}
+
+function setPOOverride(ref, type, value) {
+  const key = `po_${ref}`;
+  if (!APP.overrides[key]) APP.overrides[key] = {};
+  if (type === 'exclude') {
+    if (value) APP.overrides[key].exclude = true;
+    else delete APP.overrides[key].exclude;
+  } else if (type === 'landing') {
+    if (value) APP.overrides[key].landingMonth = value;
+    else delete APP.overrides[key].landingMonth;
+  }
+  if (!Object.keys(APP.overrides[key]).length) delete APP.overrides[key];
+  localStorage.setItem('ordersheet_overrides', JSON.stringify(APP.overrides));
+  const scroll = document.getElementById('sheetScroll');
+  const st=scroll?.scrollTop||0, sl=scroll?.scrollLeft||0;
+  buildSheet();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const s=document.getElementById('sheetScroll'); if(s){s.scrollTop=st;s.scrollLeft=sl;} }));
+}
+
+function onSizeBkOverride(cell) {
+  const size = cell.dataset.size;
+  const val  = parseFloat(cell.textContent.replace('%',''));
+  if (!APP.overrides.sizeBreakdown) APP.overrides.sizeBreakdown={};
+  if (!isNaN(val)) APP.overrides.sizeBreakdown[size]=val;
+  else delete APP.overrides.sizeBreakdown[size];
+  localStorage.setItem('ordersheet_overrides', JSON.stringify(APP.overrides));
+  const scroll = document.getElementById('sheetScroll');
+  const st = scroll?.scrollTop||0, sl = scroll?.scrollLeft||0;
+  buildSheet();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ const s=document.getElementById('sheetScroll'); if(s){s.scrollTop=st;s.scrollLeft=sl;} }));
+}
+
+
+function onCellKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault(); // no newline
+    onCellEdit(e);      // save the value
+    // Reselect all text in cell so user can see result and type again
+    const cell = e.target;
+    requestAnimationFrame(() => {
+      cell.focus();
+      const range = document.createRange();
+      range.selectNodeContents(cell);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    });
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    e.target.blur(); // cancel — just leave without saving
+  }
+}
+
+function onCellEdit(e) {
+  const cell = e.target;
+  const { product, month, type } = cell.dataset;
+  let raw = cell.textContent.replace('%','').replace('+','').trim();
+
+  const val = parseFloat(raw);
+
+  if (!APP.overrides[product]) APP.overrides[product] = {};
+  if (!APP.overrides[product][month]) APP.overrides[product][month] = {};
+
+  if (!isNaN(val) && raw !== '') {
+    APP.overrides[product][month][type] = val;
+  } else {
+    delete APP.overrides[product][month][type];
+    // Clean up empty objects
+    if (!Object.keys(APP.overrides[product][month]).length) delete APP.overrides[product][month];
+    if (!Object.keys(APP.overrides[product]).length) delete APP.overrides[product];
+  }
+
+  localStorage.setItem('ordersheet_overrides', JSON.stringify(APP.overrides));
+  rebuildKeepScroll();
+}
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+function addTH(tr, text, cls='', colspan=1, rowspan=1) {
+  const th = document.createElement('th');
+  th.textContent = text; if(cls) th.className=cls;
+  if(colspan>1) th.colSpan=colspan; if(rowspan>1) th.rowSpan=rowspan;
+  tr.appendChild(th); return th;
+}
+function addTD(tr, text, cls='') {
+  const td = document.createElement('td');
+  td.textContent = text; if(cls) td.className=cls;
+  tr.appendChild(td); return td;
+}
+function fmt(n) { if(n===null||n===undefined||isNaN(n)) return '—'; if(n===0) return '-'; return Number(n).toLocaleString(); }
+function formatDate(d) { return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+// ══════════════════════════════════════════════════
+// PRESETS
+// ══════════════════════════════════════════════════
+function savePreset() {
+  const input = document.getElementById('presetNameInput');
+  const name = (input?.value || '').trim() || `${APP.sheet.category} ${new Date().toLocaleDateString()}`;
+  const preset = {
+    id: Date.now(), name, category: APP.sheet.category,
+    selectedProducts: APP.sheet.selectedProducts,
+    activeMonths: APP.sheet.activeMonths,
+    salesPeriod: document.getElementById('selSalesPeriod').value,
+    dos: APP.config.dos,
+    stores: APP.config.stores,
+    overrides: JSON.parse(JSON.stringify(APP.overrides)),
+    createdAt: new Date().toISOString()
+  };
+  APP.presets.unshift(preset);
+  localStorage.setItem('ordersheet_presets', JSON.stringify(APP.presets));
+  if (input) input.value = '';
+  renderPresetsUI();
+  updatePresetSelect();
+  notify('Preset saved: ' + name, 'success');
+}
+
+function loadPreset() {
+  const id = APP.sheet.activePresetId;
+  if (!id) return;
+  const preset = APP.presets.find(p => p.id === id);
+  if (!preset) return;
+  APP.sheet.category = preset.category;
+  APP.sheet.selectedProducts = [...preset.selectedProducts];
+  APP.sheet.activeMonths = [...preset.activeMonths];
+  APP.overrides = preset.overrides || {};
+  SS.type.value = preset.category; document.getElementById('ss-type-input').value = preset.category;
+  if(document.getElementById('selSalesPeriod')) document.getElementById('selSalesPeriod').value = preset.salesPeriod;
+  APP.config.dos = preset.dos;
+  APP.config.stores = preset.stores;
+  buildSheet();
+  notify('Preset loaded: ' + preset.name, 'success');
+}
+
+function deletePreset(id) {
+  APP.presets = APP.presets.filter(p=>p.id!==id);
+  localStorage.setItem('ordersheet_presets', JSON.stringify(APP.presets));
+  renderPresetsUI(); updatePresetSelect();
+}
+
+function renderPresetsUI() {
+  const list = document.getElementById('presetList');
+  if (!APP.presets.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px 0">No presets yet — set up your view and save it above</div>';
+    return;
+  }
+  list.innerHTML = '';
+  APP.presets.forEach(p => {
+    const isActive = APP.sheet.activePresetId === p.id;
+    const div = document.createElement('div');
+    div.className = 'preset-item' + (isActive ? ' active' : '');
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="preset-name">${p.name}</div>
+          <div class="preset-meta">${p.category||'—'} • ${p.selectedProducts?.length||0} products • ${(p.activeMonths||[]).join(', ')}</div>
+          <div class="preset-meta" style="margin-top:2px">${p.salesPeriod||'L30'} • DOS ${p.dos||30}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePreset(${p.id})" style="flex-shrink:0;margin-left:6px">✕</button>
+      </div>`;
+    div.onclick = () => loadPresetById(p.id);
+    div.title = 'Click to load';
+    div.style.cursor = 'pointer';
+    list.appendChild(div);
+  });
+  updatePresetSelect();
+}
+
+function loadPresetById(id) {
+  APP.sheet.activePresetId = id;
+  APP.sheet.activePresetId = id;
+  loadPreset();
+  renderPresetsUI(); // refresh to show active highlight
+}
+
+function updatePresetSelect() { /* preset select removed — using sidebar list */ }
+
+// ══════════════════════════════════════════════════
+// HISTORY / SAVE
+// ══════════════════════════════════════════════════
+async function saveOrder() {
+  const orderDate = document.getElementById('selOrderDate').value;
+  const category = APP.sheet.category;
+  if (!category) { notify('Select a category first', 'error'); return; }
+  const year = new Date(orderDate).getFullYear();
+  const dateStr = orderDate.replace(/-/g,'.');
+  const filename = `${dateStr}-${category.replace(/\s+/g,'-')}-Order.json`;
+  const path = `Ordering Sheet/${category}/${year}/${filename}`;
+  const data = {
+    category, orderDate, selectedProducts: APP.sheet.selectedProducts,
+    activeMonths: APP.sheet.activeMonths, salesPeriod: document.getElementById('selSalesPeriod').value,
+    dos: APP.config.dos, stores: APP.config.stores,
+    overrides: APP.overrides, savedAt: new Date().toISOString(), version: '1.0'
+  };
+
+  // Add to local history
+  const histEntry = { id: Date.now(), filename, path, category, orderDate, savedAt: data.savedAt };
+  APP.history.unshift(histEntry);
+  if (APP.history.length > 50) APP.history = APP.history.slice(0,50);
+  localStorage.setItem('ordersheet_history', JSON.stringify(APP.history));
+  localStorage.setItem('ordersheet_savedate_'+orderDate, new Date().toISOString());
+  renderHistoryUI();
+
+  // Save to GitHub if configured
+  if (APP.config.ghToken && APP.config.ghOwner && APP.config.ghRepo) {
+    try {
+      await saveToGitHub(path, JSON.stringify(data, null, 2));
+      notify(`Saved to GitHub: ${path}`, 'success');
+    } catch(e) {
+      notify(`GitHub save failed: ${e.message}. Saved locally.`, 'error');
+    }
+  } else {
+    localStorage.setItem('ordersheet_order_'+histEntry.id, JSON.stringify(data));
+    notify('Saved locally (configure GitHub to save to repo)', 'success');
+  }
+}
+
+async function saveToGitHub(path, content) {
+  const { ghToken, ghOwner, ghRepo, ghBranch } = APP.config;
+  const url = `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${encodeURIComponent(path)}`;
+  // Check if file exists (to get SHA)
+  let sha = null;
+  try {
+    const existing = await fetch(url, { headers: { Authorization: `token ${ghToken}` } });
+    if (existing.ok) { const d = await existing.json(); sha = d.sha; }
+  } catch {}
+  const body = { message: `Update ${path}`, content: btoa(unescape(encodeURIComponent(content))), branch: ghBranch };
+  if (sha) body.sha = sha;
+  const res = await fetch(url, { method: 'PUT', headers: { Authorization: `token ${ghToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.message || 'GitHub API error'); }
+}
+
+async function loadFromGitHub(path) {
+  const { ghToken, ghOwner, ghRepo, ghBranch } = APP.config;
+  const url = `https://api.github.com/repos/${ghOwner}/${ghRepo}/contents/${encodeURIComponent(path)}`;
+  const res = await fetch(url, { headers: ghToken ? { Authorization: `token ${ghToken}` } : {} });
+  if (!res.ok) throw new Error(`Not found: ${path}`);
+  const d = await res.json();
+  return JSON.parse(decodeURIComponent(escape(atob(d.content))));
+}
+
+function renderHistoryUI() {
+  const list = document.getElementById('historyList');
+  if (!APP.history.length) { list.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">No saved orders yet</div>'; return; }
+  list.innerHTML = '';
+  APP.history.slice(0,20).forEach(h => {
+    const today = new Date().toISOString().split('T')[0];
+    const isToday = h.orderDate === today;
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<div class="history-date">${h.orderDate}${isToday?' <span style="color:var(--green);font-size:10px">TODAY</span>':''}</div>
+      <div class="history-meta">${h.category} • ${h.filename}</div>
+      <div class="history-actions">
+        <button class="btn btn-outline btn-sm" onclick="loadHistoryEntry(${h.id})">Load</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadHistoryExcel(${h.id})">Excel</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function loadHistoryEntry(id) {
+  const entry = APP.history.find(h=>h.id===id);
+  if (!entry) return;
+  let data;
+  if (APP.config.ghToken && APP.config.ghOwner) {
+    try { data = await loadFromGitHub(entry.path); } catch {}
+  }
+  if (!data) {
+    const local = localStorage.getItem('ordersheet_order_'+id);
+    if (local) data = JSON.parse(local);
+  }
+  if (!data) { notify('Could not load order data', 'error'); return; }
+
+  APP.sheet.category = data.category;
+  APP.sheet.selectedProducts = data.selectedProducts;
+  APP.sheet.activeMonths = data.activeMonths;
+  APP.overrides = data.overrides || {};
+  SS.type.value = data.category; document.getElementById('ss-type-input').value = data.category;
+  document.getElementById('selSalesPeriod').value = data.salesPeriod;
+  if(document.getElementById('selOrderDate')) document.getElementById('selOrderDate').value = data.orderDate;
+  if(document.getElementById('inpDOS')) document.getElementById('inpDOS').value = data.dos;
+  if(document.getElementById('inpStores')) document.getElementById('inpStores').value = data.stores;
+
+  // Check if editable (only today)
+  const today = new Date().toISOString().split('T')[0];
+  APP.editableToday = (data.orderDate === today);
+  buildSheet();
+  notify(`Loaded: ${entry.filename}`, 'success');
+}
+
+function downloadHistoryExcel(id) {
+  loadHistoryEntry(id).then(() => exportExcel());
+}
+
+// ══════════════════════════════════════════════════
+// EXCEL EXPORT (SheetJS)
+// ══════════════════════════════════════════════════
+function exportExcel() {
+  const odStr    = document.getElementById('selOrderDate')?.value || APP.sheet.orderDate;
+  const category = SS.type.value || APP.sheet.category;
+  const products = APP.sheet.selectedProducts || [];
+  const period   = document.getElementById('selSalesPeriod')?.value || 'L30';
+  const bkPeriod = APP.sheet.breakdownPeriod || period;
+
+  if (!products.length) { notify('No products to export', 'error'); return; }
+  if (typeof XLSX === 'undefined') { notify('XLSX library not loaded', 'error'); return; }
+
+  const orderDate = new Date(odStr + 'T12:00:00');
+  const orderDay  = orderDate.getDate();
+  const _av2 = getAvailableSizes(products);
+  const SIZES = (APP.sheet.selectedSizes?.length && APP.sheet.selectedSizes.some(s=>_av2.map(String).includes(String(s)))) ? APP.sheet.selectedSizes : _av2;
+  const periodDays= getPeriodDays(period);
+
+  // 12 rolling months
+  const rollingMonths = [];
+  for (let i=0;i<12;i++){
+    const d=new Date(orderDate); d.setDate(1); d.setMonth(d.getMonth()+i);
+    const days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+    rollingMonths.push({name:MONTHS_FULL[d.getMonth()],year:d.getFullYear(),idx:d.getMonth(),days});
+  }
+
+  // ── Build sheet cell by cell ──
+  const ws = {};
+  let maxCol = 0;
+  let r = 0; // 0-indexed row
+
+  const EC = (row,col) => XLSX.utils.encode_cell({r:row,c:col});
+
+  // Write helpers
+  const wVal = (row, col, v, fmt) => {
+    const a = EC(row,col);
+    if (maxCol < col) maxCol = col;
+    if (v === null || v === undefined || v === '') { ws[a]={t:'s',v:''}; return a; }
+    if (typeof v === 'number') {
+      ws[a] = {t:'n', v, z: fmt || '#,##0'};
+    } else {
+      ws[a] = {t:'s', v:String(v)};
+    }
+    return a;
+  };
+  const wFml = (row, col, f, fmt) => {
+    const a = EC(row,col);
+    if (maxCol < col) maxCol = col;
+    ws[a] = {t:'n', f, z: fmt || '#,##0'};
+    return a;
+  };
+  const wHdr = (row, col, v) => {
+    const a = EC(row,col);
+    if (maxCol < col) maxCol = col;
+    ws[a] = {t:'s', v:String(v||'')};
+    return a;
+  };
+
+  // Column layout
+  // A=0: Product, B-H(1-7): sizes, I(8): Total, J(9): Period Sales, K(10): DOS,
+  // L(11): Est Month Sales, M(12): L90
+  // For month sections: same A-I cols for sizes/total, J(9): Override, K(10): Bump%, L(11): Proj(formula), M(12): LY
+
+  const SCOL = 1; // first size col
+  const TCOL = 8; // total col
+  const PSALE_COL = 9; // period sales
+  const DOS_COL   = 10;
+  const EST_COL   = 11;
+  const L90_COL   = 12;
+
+  const OV_COL  = 9;  // override (month sections)
+  const BMP_COL = 10; // bump%
+  const PROJ_COL= 11; // formula-driven projection
+  const LY_COL  = 12;
+
+  // ── TITLE ──
+  wHdr(r,0,category); r++;
+  wHdr(r,0,odStr); r++;
+  wHdr(r,0,`Period: ${period} | Breakdown: ${bkPeriod}`); r++;
+  r++; // blank
+
+  // ── SECTION 1: CURRENT INVENTORY ──
+  wHdr(r,0,`Current Inventory – ${odStr}`);
+  SIZES.forEach((s,i) => wHdr(r, SCOL+i, s));
+  wHdr(r,TCOL,'Grand Total');
+  wHdr(r,PSALE_COL,`${period} Sales`);
+  wHdr(r,DOS_COL,'DOS');
+  wHdr(r,EST_COL,`Est. ${rollingMonths[0].name} Sales`);
+  wHdr(r,L90_COL,'L90 Days');
+  r++;
+
+  const invRowByProduct = {};
+  let invGrandRow;
+  const invDataRowStart = r;
+
+  products.forEach(p => {
+    invRowByProduct[p] = r;
+    const inv   = getInventoryForProduct(p);
+    const sales = getSalesForProduct(p, period);
+    const l90   = getSalesForProduct(p, 'L90');
+    const invBySz = SIZES.map(s => (inv.onHand[s]||0)+(inv.inTransit[s]||0));
+    invBySz.forEach((v,i) => wVal(r, SCOL+i, v));
+    // Total = SUM of sizes
+    const szRange = `${EC(r,SCOL)}:${EC(r,SCOL+SIZES.length-1)}`;
+    wFml(r, TCOL, `SUM(${szRange})`);
+    // Period sales
+    wVal(r, PSALE_COL, SIZES.reduce((a,s)=>a+(sales[s]||0),0));
+    // DOS = Total / (Sales/periodDays)
+    wFml(r, DOS_COL, `IFERROR(ROUND(${EC(r,TCOL)}/(${EC(r,PSALE_COL)}/${periodDays}),0),"-")`,'0');
+    // Est Month Sales = Sales/periodDays * remainingDays
+    const remainDays = rollingMonths[0].days - orderDay + 1;
+    wFml(r, EST_COL, `ROUND(${EC(r,PSALE_COL)}/${periodDays}*${remainDays},0)`);
+    // L90
+    wVal(r, L90_COL, SIZES.reduce((a,s)=>a+(l90[s]||0),0));
+    r++;
+  });
+
+  // Grand total row
+  invGrandRow = r;
+  wHdr(r,0,'Grand Total');
+  SIZES.forEach((_,i) => {
+    wFml(r, SCOL+i, `SUM(${EC(invDataRowStart,SCOL+i)}:${EC(r-1,SCOL+i)})`);
+  });
+  wFml(r, TCOL,    `SUM(${EC(invDataRowStart,TCOL)}:${EC(r-1,TCOL)})`);
+  wFml(r, PSALE_COL,`SUM(${EC(invDataRowStart,PSALE_COL)}:${EC(r-1,PSALE_COL)})`);
+  wFml(r, EST_COL,  `SUM(${EC(invDataRowStart,EST_COL)}:${EC(r-1,EST_COL)})`);
+  wFml(r, L90_COL,  `SUM(${EC(invDataRowStart,L90_COL)}:${EC(r-1,L90_COL)})`);
+  r+=3; // gap
+
+  // ── SECTION 2: SIZE BREAKDOWN ──
+  wHdr(r,0,`Size Breakdown (${bkPeriod}) — edit yellow % row to override`);
+  SIZES.forEach((s,i)=>wHdr(r,SCOL+i,s)); r++;
+
+  const bkSalesRow = r;
+  wHdr(r,0,'Total Sales');
+  products.forEach(p => {
+    const sal = bkPeriod==='custom'
+      ? getHistoricalSizeBreakdown(p,APP.sheet.bkFromDate,APP.sheet.bkToDate,SIZES)
+      : getSalesForProduct(p, bkPeriod);
+    SIZES.forEach((s,i)=>{ const cur=ws[EC(bkSalesRow,SCOL+i)]; const prev=cur&&cur.v?cur.v:0; wVal(bkSalesRow,SCOL+i,prev+(sal[s]||0)); });
+  });
+  r++;
+
+  const bkPctRow = r;
+  wHdr(r,0,'Average %');
+  const bkTotalFml = `SUM(${EC(bkSalesRow,SCOL)}:${EC(bkSalesRow,SCOL+SIZES.length-1)})`;
+  SIZES.forEach((_,i) => wFml(r,SCOL+i,`IFERROR(${EC(bkSalesRow,SCOL+i)}/(${bkTotalFml}),0)`,'0.0%'));
+  r++;
+
+  // Override row — yellow, user types % directly
+  const bkOvRow = r;
+  wHdr(r,0,'Override % (yellow = editable)');
+  const existingOv = APP.overrides?.sizeBreakdown || {};
+  SIZES.forEach((s,i) => {
+    const ov = existingOv[s];
+    wVal(r, SCOL+i, ov !== undefined ? ov/100 : null, '0.0%');
+  });
+  r++;
+
+  // Effective breakdown % = if override set use it, else use average
+  const bkEffRow = r;
+  wHdr(r,0,'Effective %');
+  SIZES.forEach((_,i) => {
+    const ovCell = EC(bkOvRow,SCOL+i);
+    const avCell = EC(bkPctRow,SCOL+i);
+    wFml(r,SCOL+i,`IF(${ovCell}<>"",${ovCell},${avCell})`,'0.0%');
+  });
+  r+=3;
+
+  // ── SECTION 3: 12 MONTH ROLLING (formulas!) ──
+  // Track the "proj total" cell per product per month for chaining
+  let projCellByProduct = {};
+  products.forEach(p => {
+    // Month 0 proj = Est Month Sales from inventory section
+    projCellByProduct[p] = EC(invRowByProduct[p], EST_COL);
+  });
+
+  rollingMonths.forEach((mo, mi) => {
+    // Month header row
+    wHdr(r,0,`${mo.name} ${mo.year} Sales`);
+    SIZES.forEach((s,i)=>wHdr(r,SCOL+i,s));
+    wHdr(r,TCOL,'Actual Proj Total');
+    wHdr(r,OV_COL,'Override (editable)');
+    wHdr(r,BMP_COL,'Sales Bump % (editable)');
+    wHdr(r,PROJ_COL,'Formula Proj');
+    wHdr(r,LY_COL,`LY ${mo.name} ${mo.year-1}`);
+    r++;
+
+    const moDataStart = r;
+    const newProjByProduct = {};
+
+    products.forEach(p => {
+      const prevProjCell = projCellByProduct[p];
+      const ovSales = APP.overrides?.[p]?.[mo.name]?.sales;
+      const bump    = APP.overrides?.[p]?.[mo.name]?.bump ?? null;
+
+      // Override cell (yellow)
+      const ovCell  = EC(r, OV_COL);
+      const bmpCell = EC(r, BMP_COL);
+      const projCell= EC(r, PROJ_COL);
+
+      wVal(r, OV_COL,  ovSales ?? null, '#,##0');
+      wVal(r, BMP_COL, bump !== null ? bump/100 : null, '0%');
+
+      // Formula proj: if it's current month use est, else prev*(1+bump)
+      if (mi === 0) {
+        // Current month — proj = est month sales (already set in prevProjCell)
+        wFml(r, PROJ_COL, prevProjCell);
+      } else {
+        // Future month: prev proj * (1 + bump%) — bump defaults to 0 if blank
+        wFml(r, PROJ_COL, `ROUND(${prevProjCell}*(1+IF(${bmpCell}<>"",${bmpCell},0)),0)`);
+      }
+
+      // Actual used = override if set, else formula
+      wFml(r, TCOL, `IF(${ovCell}<>"",${ovCell},${projCell})`);
+
+      // Distribute by size using effective breakdown %
+      SIZES.forEach((_,i) => {
+        const pctCell = EC(bkEffRow, SCOL+i);
+        wFml(r, SCOL+i, `ROUND(${EC(r,TCOL)}*${pctCell},0)`);
+      });
+
+      // LY data
+      const lyT = SIZES.reduce((a,s)=>a+(getHistoricalSalesForProduct(p,mo.year-1,mo.idx+1)[s]||0),0);
+      wVal(r, LY_COL, lyT || null);
+
+      newProjByProduct[p] = EC(r, TCOL); // chain to next month
+      r++;
+    });
+
+    // Grand total row
+    wHdr(r,0,'Grand Total');
+    SIZES.forEach((_,i)=> wFml(r,SCOL+i,`SUM(${EC(moDataStart,SCOL+i)}:${EC(r-1,SCOL+i)})`));
+    wFml(r,TCOL,`SUM(${EC(moDataStart,TCOL)}:${EC(r-1,TCOL)})`);
+    wFml(r,PROJ_COL,`SUM(${EC(moDataStart,PROJ_COL)}:${EC(r-1,PROJ_COL)})`);
+    r+=2;
+
+    projCellByProduct = {...projCellByProduct, ...newProjByProduct};
+  });
+
+  // Finalize sheet range
+  ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:r,c:maxCol}});
+  const maxNameLen = Math.max(...products.map(p=>p.length), 20);
+  ws['!cols'] = [{wch:Math.min(maxNameLen, 45)},{wch:7},{wch:7},{wch:7},{wch:7},{wch:7},{wch:7},{wch:7},{wch:10},{wch:14},{wch:10},{wch:14},{wch:10}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, (category||'Order').slice(0,31));
+
+  const fname = `${odStr.replace(/-/g,'')}-${(category||'Order').replace(/\s+/g,'-')}-Order.xlsx`;
+  XLSX.writeFile(wb, fname);
+  notify(`✅ Downloaded: ${fname} (formulas included)`, 'success');
+}
+
+
+// ══════════════════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════════════════
+function updateSummary(products, months, totals) {
+  const content = document.getElementById('summaryContent');
+  let html = '';
+  months.forEach(m => {
+    html += `<div style="margin-bottom:12px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:4px;color:var(--accent)">${m}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px">
+        <div style="color:var(--text3)">Proj. Sales:</div><div style="text-align:right;font-family:monospace">${fmt(Math.round(totals.monthProjSales[m]))}</div>
+        <div style="color:var(--text3)">Proj. Inventory:</div><div style="text-align:right;font-family:monospace">${fmt(Math.round(totals.monthInv[m].total))}</div>
+        <div style="color:var(--text3)">Order Qty:</div><div style="text-align:right;font-family:monospace;color:var(--yellow);font-weight:600">${fmt(Math.round(totals.monthOrderQty[m]))}</div>
+      </div>
+    </div>`;
+  });
+  content.innerHTML = html;
+  document.getElementById('side-summary');
+}
+
+// ══════════════════════════════════════════════════
+// UI UTILITIES
+// ══════════════════════════════════════════════════
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
+function showLoading(msg) { document.getElementById('loadingOverlay').classList.remove('hidden'); document.getElementById('loadingMsg').textContent = msg||'Loading...'; }
+function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+function setStatus(type, text) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'status-dot' + (type==='loading'?' loading':type==='error'?' error':'');
+  txt.textContent = text;
+  APP.connected = type === 'ok';
+}
+function notify(msg, type='info') {
+  const n = document.getElementById('notification');
+  n.textContent = msg; n.className = `notification ${type}`;
+  clearTimeout(n._t);
+  n._t = setTimeout(() => n.classList.add('hide'), 3500);
+}
+function switchSideTab(tab) {
+  ['presets','history','summary'].forEach(t => {
+    document.getElementById('side-'+t).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.sidebar-tab').forEach((el,i) => {
+    el.classList.toggle('active', ['presets','history','summary'][i]===tab);
+  });
+}
+</script>
+</body>
+</html>
