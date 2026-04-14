@@ -31783,6 +31783,42 @@
       "size": "XXL"
     },
     {
+      "sku": "SL-CBD-BLACKPPBD-3XL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "3XL"
+    },
+    {
+      "sku": "SL-CBD-BLACKPPBD-L",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Large"
+    },
+    {
+      "sku": "SL-CBD-BLACKPPBD-M",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Medium"
+    },
+    {
+      "sku": "SL-CBD-BLACKPPBD-S",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Small"
+    },
+    {
+      "sku": "SL-CBD-BLACKPPBD-XL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "XL"
+    },
+    {
+      "sku": "SL-CBD-BLACKPPBD-XXL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "XXL"
+    },
+    {
       "sku": "SL-CBD-BROWNPPBD-3XL",
       "parentName": "Patch Pocket Button Down - Brown",
       "category": "Patch Pocket Button Down",
@@ -31959,6 +31995,42 @@
     {
       "sku": "SL-CBD-NAVYPPBD-XXL",
       "parentName": "Patch Pocket Button Down - Navy",
+      "category": "Patch Pocket Button Down",
+      "size": "XXL"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-3XL",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "3XL"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-L",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Large"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-M",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Medium"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-S",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Small"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-XL",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "XL"
+    },
+    {
+      "sku": "SL-CBD-OLIVEPPBD-XXL",
+      "parentName": "Patch Pocket Button Down - Olive",
       "category": "Patch Pocket Button Down",
       "size": "XXL"
     },
@@ -51919,11 +51991,13 @@
       "Tan Open Button Overcoat"
     ],
     "Patch Pocket Button Down": [
+      "Patch Pocket Button Down - Black",
       "Patch Pocket Button Down - Brown",
       "Patch Pocket Button Down - Charcoal",
       "Patch Pocket Button Down - Heathered Grey",
       "Patch Pocket Button Down - Light Grey",
       "Patch Pocket Button Down - Navy",
+      "Patch Pocket Button Down - Olive",
       "Waffle Patch Pocket Button Down - Black",
       "Waffle Patch Pocket Button Down - Heathered White"
     ],
@@ -84327,6 +84401,42 @@
       "category": "Overcoats",
       "size": "XXL"
     },
+    "SL-CBD-BLACKPPBD-3XL": {
+      "sku": "SL-CBD-BLACKPPBD-3XL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "3XL"
+    },
+    "SL-CBD-BLACKPPBD-L": {
+      "sku": "SL-CBD-BLACKPPBD-L",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Large"
+    },
+    "SL-CBD-BLACKPPBD-M": {
+      "sku": "SL-CBD-BLACKPPBD-M",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Medium"
+    },
+    "SL-CBD-BLACKPPBD-S": {
+      "sku": "SL-CBD-BLACKPPBD-S",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "Small"
+    },
+    "SL-CBD-BLACKPPBD-XL": {
+      "sku": "SL-CBD-BLACKPPBD-XL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "XL"
+    },
+    "SL-CBD-BLACKPPBD-XXL": {
+      "sku": "SL-CBD-BLACKPPBD-XXL",
+      "parentName": "Patch Pocket Button Down - Black",
+      "category": "Patch Pocket Button Down",
+      "size": "XXL"
+    },
     "SL-CBD-BROWNPPBD-3XL": {
       "sku": "SL-CBD-BROWNPPBD-3XL",
       "parentName": "Patch Pocket Button Down - Brown",
@@ -84504,6 +84614,42 @@
     "SL-CBD-NAVYPPBD-XXL": {
       "sku": "SL-CBD-NAVYPPBD-XXL",
       "parentName": "Patch Pocket Button Down - Navy",
+      "category": "Patch Pocket Button Down",
+      "size": "XXL"
+    },
+    "SL-CBD-OLIVEPPBD-3XL": {
+      "sku": "SL-CBD-OLIVEPPBD-3XL",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "3XL"
+    },
+    "SL-CBD-OLIVEPPBD-L": {
+      "sku": "SL-CBD-OLIVEPPBD-L",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Large"
+    },
+    "SL-CBD-OLIVEPPBD-M": {
+      "sku": "SL-CBD-OLIVEPPBD-M",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Medium"
+    },
+    "SL-CBD-OLIVEPPBD-S": {
+      "sku": "SL-CBD-OLIVEPPBD-S",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "Small"
+    },
+    "SL-CBD-OLIVEPPBD-XL": {
+      "sku": "SL-CBD-OLIVEPPBD-XL",
+      "parentName": "Patch Pocket Button Down - Olive",
+      "category": "Patch Pocket Button Down",
+      "size": "XL"
+    },
+    "SL-CBD-OLIVEPPBD-XXL": {
+      "sku": "SL-CBD-OLIVEPPBD-XXL",
+      "parentName": "Patch Pocket Button Down - Olive",
       "category": "Patch Pocket Button Down",
       "size": "XXL"
     },
@@ -103576,5 +103722,5 @@
       "size": "48"
     }
   },
-  "exportedAt": "2026-04-13T21:00:53.683Z"
+  "exportedAt": "2026-04-14T09:36:46.077Z"
 }
