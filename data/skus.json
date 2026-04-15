@@ -22540,7 +22540,7 @@
       "sku": "SL-DS-MARTIN-XL",
       "parentName": "The Martin'' Big Light Purple Check",
       "category": "Dress Shirt",
-      "size": "Extra Large"
+      "size": "XL"
     },
     {
       "sku": "SL-DS-MARTIN-XXL",
@@ -22804,7 +22804,7 @@
       "sku": "SL-DS-MILES-XL",
       "parentName": "The Miles'' Maize, Blue, and Purple Plaid",
       "category": "Dress Shirt",
-      "size": "Extra Large"
+      "size": "XL"
     },
     {
       "sku": "SL-DS-MILES-XXL",
@@ -25216,7 +25216,7 @@
       "sku": "SL-H-BOYER-XS",
       "parentName": "The Boyer'' Heathered Grey Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     {
       "sku": "SL-H-BOYER-XXL",
@@ -25582,7 +25582,7 @@
       "sku": "SL-H-POTTER-XS",
       "parentName": "The Potter'' Heathered Charcoal Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     {
       "sku": "SL-H-POTTER-XXL",
@@ -25624,7 +25624,7 @@
       "sku": "SL-H-QUINN-XS",
       "parentName": "The Quinn'' Heathered White Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     {
       "sku": "SL-H-QUINN-XXL",
@@ -25804,7 +25804,7 @@
       "sku": "SL-H-WOODS-XS",
       "parentName": "The Woods'' Heathered Brown Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     {
       "sku": "SL-H-WOODS-XXL",
@@ -36831,6 +36831,78 @@
     {
       "sku": "SL-QZIP-LIGHTOLIVE-XXL",
       "parentName": "Light Olive Quarter Zip",
+      "category": "Quarter Zips",
+      "size": "XXL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-3XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "3XL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-L",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Large"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-M",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Medium"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-S",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Small"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "XL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDBLACK-XXL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "XXL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-3XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "3XL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-L",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Large"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-M",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Medium"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-S",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Small"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "XL"
+    },
+    {
+      "sku": "SL-QZIP-RIBBEDGREY-XXL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
       "category": "Quarter Zips",
       "size": "XXL"
     },
@@ -50839,6 +50911,42 @@
       "size": "48"
     },
     {
+      "sku": "SL-VEST-006-38",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "38"
+    },
+    {
+      "sku": "SL-VEST-006-40",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "40"
+    },
+    {
+      "sku": "SL-VEST-006-42",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "42"
+    },
+    {
+      "sku": "SL-VEST-006-44",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "44"
+    },
+    {
+      "sku": "SL-VEST-006-46",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "46"
+    },
+    {
+      "sku": "SL-VEST-006-48",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "48"
+    },
+    {
       "sku": "SL-VEST-004-38",
       "parentName": "Athletic fit Stretch Suit Vest - Heathered Grey",
       "category": "Vests",
@@ -52188,6 +52296,8 @@
       "Brushed Quarter Zip - Heathered Olive",
       "Light Blue Quarter Zip",
       "Light Olive Quarter Zip",
+      "Mid-Weight Ribbed Quarter Zip - Black",
+      "Mid-Weight Ribbed Quarter Zip - Grey",
       "Mid-Weight Wool Quarter Zip - Brown",
       "Mid-Weight Wool Quarter Zip - Charcoal",
       "Quarter Zip - Heathered Grey",
@@ -52609,6 +52719,7 @@
     "Vests": [
       "Athletic Fit Stretch Suit Vest - Black",
       "Athletic fit Stretch Suit Vest - Blue Plaid",
+      "Athletic Fit Stretch Suit Vest - Heathered Blue",
       "Athletic fit Stretch Suit Vest - Heathered Grey",
       "Athletic fit Stretch Suit Vest - Heathered Light Blue",
       "Athletic fit Stretch Suit Vest - Heathered Maroon",
@@ -75159,7 +75270,7 @@
       "sku": "SL-DS-MARTIN-XL",
       "parentName": "The Martin'' Big Light Purple Check",
       "category": "Dress Shirt",
-      "size": "Extra Large"
+      "size": "XL"
     },
     "SL-DS-MARTIN-XXL": {
       "sku": "SL-DS-MARTIN-XXL",
@@ -75423,7 +75534,7 @@
       "sku": "SL-DS-MILES-XL",
       "parentName": "The Miles'' Maize, Blue, and Purple Plaid",
       "category": "Dress Shirt",
-      "size": "Extra Large"
+      "size": "XL"
     },
     "SL-DS-MILES-XXL": {
       "sku": "SL-DS-MILES-XXL",
@@ -77835,7 +77946,7 @@
       "sku": "SL-H-BOYER-XS",
       "parentName": "The Boyer'' Heathered Grey Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     "SL-H-BOYER-XXL": {
       "sku": "SL-H-BOYER-XXL",
@@ -78201,7 +78312,7 @@
       "sku": "SL-H-POTTER-XS",
       "parentName": "The Potter'' Heathered Charcoal Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     "SL-H-POTTER-XXL": {
       "sku": "SL-H-POTTER-XXL",
@@ -78243,7 +78354,7 @@
       "sku": "SL-H-QUINN-XS",
       "parentName": "The Quinn'' Heathered White Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     "SL-H-QUINN-XXL": {
       "sku": "SL-H-QUINN-XXL",
@@ -78423,7 +78534,7 @@
       "sku": "SL-H-WOODS-XS",
       "parentName": "The Woods'' Heathered Brown Henley",
       "category": "Henley",
-      "size": "Extra Small"
+      "size": "XS"
     },
     "SL-H-WOODS-XXL": {
       "sku": "SL-H-WOODS-XXL",
@@ -89450,6 +89561,78 @@
     "SL-QZIP-LIGHTOLIVE-XXL": {
       "sku": "SL-QZIP-LIGHTOLIVE-XXL",
       "parentName": "Light Olive Quarter Zip",
+      "category": "Quarter Zips",
+      "size": "XXL"
+    },
+    "SL-QZIP-RIBBEDBLACK-3XL": {
+      "sku": "SL-QZIP-RIBBEDBLACK-3XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "3XL"
+    },
+    "SL-QZIP-RIBBEDBLACK-L": {
+      "sku": "SL-QZIP-RIBBEDBLACK-L",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Large"
+    },
+    "SL-QZIP-RIBBEDBLACK-M": {
+      "sku": "SL-QZIP-RIBBEDBLACK-M",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Medium"
+    },
+    "SL-QZIP-RIBBEDBLACK-S": {
+      "sku": "SL-QZIP-RIBBEDBLACK-S",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "Small"
+    },
+    "SL-QZIP-RIBBEDBLACK-XL": {
+      "sku": "SL-QZIP-RIBBEDBLACK-XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "XL"
+    },
+    "SL-QZIP-RIBBEDBLACK-XXL": {
+      "sku": "SL-QZIP-RIBBEDBLACK-XXL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Black",
+      "category": "Quarter Zips",
+      "size": "XXL"
+    },
+    "SL-QZIP-RIBBEDGREY-3XL": {
+      "sku": "SL-QZIP-RIBBEDGREY-3XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "3XL"
+    },
+    "SL-QZIP-RIBBEDGREY-L": {
+      "sku": "SL-QZIP-RIBBEDGREY-L",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Large"
+    },
+    "SL-QZIP-RIBBEDGREY-M": {
+      "sku": "SL-QZIP-RIBBEDGREY-M",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Medium"
+    },
+    "SL-QZIP-RIBBEDGREY-S": {
+      "sku": "SL-QZIP-RIBBEDGREY-S",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "Small"
+    },
+    "SL-QZIP-RIBBEDGREY-XL": {
+      "sku": "SL-QZIP-RIBBEDGREY-XL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
+      "category": "Quarter Zips",
+      "size": "XL"
+    },
+    "SL-QZIP-RIBBEDGREY-XXL": {
+      "sku": "SL-QZIP-RIBBEDGREY-XXL",
+      "parentName": "Mid-Weight Ribbed Quarter Zip - Grey",
       "category": "Quarter Zips",
       "size": "XXL"
     },
@@ -103457,6 +103640,42 @@
       "category": "Vests",
       "size": "48"
     },
+    "SL-VEST-006-38": {
+      "sku": "SL-VEST-006-38",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "38"
+    },
+    "SL-VEST-006-40": {
+      "sku": "SL-VEST-006-40",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "40"
+    },
+    "SL-VEST-006-42": {
+      "sku": "SL-VEST-006-42",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "42"
+    },
+    "SL-VEST-006-44": {
+      "sku": "SL-VEST-006-44",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "44"
+    },
+    "SL-VEST-006-46": {
+      "sku": "SL-VEST-006-46",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "46"
+    },
+    "SL-VEST-006-48": {
+      "sku": "SL-VEST-006-48",
+      "parentName": "Athletic Fit Stretch Suit Vest - Heathered Blue",
+      "category": "Vests",
+      "size": "48"
+    },
     "SL-VEST-004-38": {
       "sku": "SL-VEST-004-38",
       "parentName": "Athletic fit Stretch Suit Vest - Heathered Grey",
@@ -103722,5 +103941,5 @@
       "size": "48"
     }
   },
-  "exportedAt": "2026-04-14T09:36:46.077Z"
+  "exportedAt": "2026-04-15T14:46:49.508Z"
 }
